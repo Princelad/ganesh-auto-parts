@@ -105,8 +105,6 @@ flutter test integration_test/  # Integration tests
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Please follow the coding conventions and style guidelines defined in the `.github/instructions/` directory.
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
