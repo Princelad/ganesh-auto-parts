@@ -1,0 +1,47 @@
+===========================================
+  GANESH AUTO PARTS - Release Build
+===========================================
+
+Application Name: Ganesh Auto Parts
+Version: 1.0.0 (Build 1)
+Build Date: $(date '+%Y-%m-%d %H:%M:%S')
+Flutter Version: $(flutter --version | head -n 1)
+
+FILES:
+------
+1. GaneshAutoParts-v1.0.0-release.apk (54 MB)
+   - For direct installation on Android devices
+   - Suitable for sharing and sideloading
+
+2. GaneshAutoParts-v1.0.0-release.aab (45 MB)
+   - For Google Play Store submission
+   - Optimized app bundle format
+
+FEATURES INCLUDED:
+------------------
+✓ Items Management (CRUD operations)
+✓ Customers Management
+✓ Invoice Management with stock deduction
+✓ Stock Adjustment
+✓ Reports & Analytics (4 report types)
+✓ CSV Export/Import
+✓ PIN Security (authentication)
+✓ Database Backup & Restore
+✓ Offline-first architecture
+✓ Real-time dashboard updates
+✓ Low stock alerts
+✓ Customer balance tracking
+✓ Payment recording
+✓ Change logging
+
+INSTALLATION:
+-------------
+APK: Transfer the .apk file to your Android device and install
+AAB: Upload to Google Play Console for store distribution
+
+REQUIREMENTS:
+-------------
+- Android 5.0 (API 21) or higher
+- ~100 MB storage space
+
+===========================================
