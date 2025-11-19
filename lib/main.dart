@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'src/screens/home_page.dart';
+import 'src/screens/auth_wrapper.dart';
 import 'src/screens/about_page.dart';
+import 'src/screens/security_settings_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -17,8 +18,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.indigo, useMaterial3: true),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomePage(),
+        '/': (context) => const AuthWrapper(),
         '/about': (context) => const AboutPage(),
+        '/security': (context) => const SecuritySettingsScreen(),
       },
     );
   }

@@ -149,6 +149,13 @@ class HomePage extends ConsumerWidget {
                     ),
                   ),
                 ),
+                _buildMenuCard(
+                  context,
+                  icon: Icons.security,
+                  title: 'Security',
+                  color: Colors.deepPurple,
+                  onTap: () => Navigator.pushNamed(context, '/security'),
+                ),
               ],
             ),
           ),
