@@ -5,13 +5,23 @@ import 'database_provider.dart';
 
 /// Notifier for managing customers
 class CustomerNotifier extends Notifier<AsyncValue<List<Customer>>> {
-  late final CustomerRepository _repository;
+  CustomerRepository get _repository => ref.read(customerRepositoryProvider);
 
   @override
   AsyncValue<List<Customer>> build() {
-    _repository = ref.read(customerRepositoryProvider);
-    loadCustomers();
+    // Load customers immediately and return the result
+    _loadInitialCustomers();
     return const AsyncValue.loading();
+  }
+
+  /// Load initial customers (called from build)
+  Future<void> _loadInitialCustomers() async {
+    try {
+      final customers = await _repository.getAll();
+      state = AsyncValue.data(customers);
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+    }
   }
 
   /// Load all customers

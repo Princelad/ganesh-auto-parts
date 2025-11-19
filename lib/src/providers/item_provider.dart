@@ -5,13 +5,23 @@ import 'database_provider.dart';
 
 /// Notifier for managing items
 class ItemNotifier extends Notifier<AsyncValue<List<Item>>> {
-  late final ItemRepository _repository;
+  ItemRepository get _repository => ref.read(itemRepositoryProvider);
 
   @override
   AsyncValue<List<Item>> build() {
-    _repository = ref.read(itemRepositoryProvider);
-    loadItems();
+    // Load items immediately and return the result
+    _loadInitialItems();
     return const AsyncValue.loading();
+  }
+
+  /// Load initial items (called from build)
+  Future<void> _loadInitialItems() async {
+    try {
+      final items = await _repository.getAll();
+      state = AsyncValue.data(items);
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+    }
   }
 
   /// Load all items

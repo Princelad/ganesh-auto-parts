@@ -10,8 +10,19 @@ class InvoiceNotifier extends Notifier<AsyncValue<List<Invoice>>> {
 
   @override
   AsyncValue<List<Invoice>> build() {
-    loadInvoices();
+    // Load invoices immediately and return the result
+    _loadInitialInvoices();
     return const AsyncValue.loading();
+  }
+
+  /// Load initial invoices (called from build)
+  Future<void> _loadInitialInvoices() async {
+    try {
+      final invoices = await _repository.getAll(limit: 100, offset: 0);
+      state = AsyncValue.data(invoices);
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+    }
   }
 
   /// Load all invoices

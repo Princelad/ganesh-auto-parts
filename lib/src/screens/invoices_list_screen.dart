@@ -234,14 +234,17 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
     final customerName = customersAsync.when(
       data: (customers) {
         if (invoice.customerId == null) return 'Walk-in Customer';
-        final customer = customers.firstWhere(
-          (c) => c.id == invoice.customerId,
-          orElse: () => null,
-        );
-        return customer?.name ?? 'Unknown Customer';
+        try {
+          final customer = customers.firstWhere(
+            (c) => c.id == invoice.customerId,
+          );
+          return customer.name;
+        } catch (e) {
+          return 'Unknown Customer';
+        }
       },
       loading: () => '...',
-      error: (_, _) => 'Unknown',
+      error: (_, __) => 'Unknown',
     );
 
     final balance = invoice.total - invoice.paid;
