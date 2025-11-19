@@ -156,6 +156,13 @@ class HomePage extends ConsumerWidget {
                   color: Colors.deepPurple,
                   onTap: () => Navigator.pushNamed(context, '/security'),
                 ),
+                _buildMenuCard(
+                  context,
+                  icon: Icons.backup,
+                  title: 'Backup & Restore',
+                  color: Colors.brown,
+                  onTap: () => Navigator.pushNamed(context, '/backup'),
+                ),
               ],
             ),
           ),
