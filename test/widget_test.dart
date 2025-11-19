@@ -12,10 +12,13 @@ void main() {
     // Allow frames to settle
     await tester.pumpAndSettle();
 
-    // Check if main menu items are displayed
-    expect(find.text('Items'), findsOneWidget);
-    expect(find.text('Customers'), findsOneWidget);
-    expect(find.text('Invoices'), findsOneWidget);
+    // Check if Quick Stats section is displayed
+    expect(find.text('Quick Stats'), findsOneWidget);
+    
+    // Check if main menu items are displayed (may appear in stats too)
+    expect(find.text('Items'), findsWidgets);
+    expect(find.text('Customers'), findsWidgets);
+    expect(find.text('Invoices'), findsWidgets);
     expect(find.text('Reports'), findsOneWidget);
   });
 }

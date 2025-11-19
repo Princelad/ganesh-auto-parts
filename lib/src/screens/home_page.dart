@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'items_list_screen.dart';
+import 'customers_list_screen.dart';
+import '../widgets/dashboard_stats_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -17,63 +19,71 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: [
-            _buildMenuCard(
-              context,
-              icon: Icons.inventory_2,
-              title: 'Items',
-              color: Colors.blue,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ItemsListScreen(),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 16),
+        children: [
+          const DashboardStatsWidget(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: [
+                _buildMenuCard(
+                  context,
+                  icon: Icons.inventory_2,
+                  title: 'Items',
+                  color: Colors.blue,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ItemsListScreen(),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            _buildMenuCard(
-              context,
-              icon: Icons.people,
-              title: 'Customers',
-              color: Colors.green,
-              onTap: () {
-                // TODO: Navigate to customers screen
-                ScaffoldMessenger.of(
+                _buildMenuCard(
                   context,
-                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
-              },
-            ),
-            _buildMenuCard(
-              context,
-              icon: Icons.receipt_long,
-              title: 'Invoices',
-              color: Colors.orange,
-              onTap: () {
-                // TODO: Navigate to invoices screen
-                ScaffoldMessenger.of(
+                  icon: Icons.people,
+                  title: 'Customers',
+                  color: Colors.green,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CustomersListScreen(),
+                    ),
+                  ),
+                ),
+                _buildMenuCard(
                   context,
-                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
-              },
-            ),
-            _buildMenuCard(
-              context,
-              icon: Icons.bar_chart,
-              title: 'Reports',
-              color: Colors.purple,
-              onTap: () {
-                // TODO: Navigate to reports screen
-                ScaffoldMessenger.of(
+                  icon: Icons.receipt_long,
+                  title: 'Invoices',
+                  color: Colors.orange,
+                  onTap: () {
+                    // TODO: Navigate to invoices screen
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Coming soon!')),
+                    );
+                  },
+                ),
+                _buildMenuCard(
                   context,
-                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
-              },
+                  icon: Icons.bar_chart,
+                  title: 'Reports',
+                  color: Colors.purple,
+                  onTap: () {
+                    // TODO: Navigate to reports screen
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Coming soon!')),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
