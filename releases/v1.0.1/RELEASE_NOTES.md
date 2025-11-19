@@ -19,11 +19,13 @@ This is a hotfix release that addresses critical runtime errors discovered in v1
 ### Bug Fixes
 
 1. **LateInitializationError Fixed**
+
    - Fixed crash where provider repository fields were being initialized multiple times
    - Changed from `late final` fields to getter pattern in ItemNotifier, CustomerNotifier, and InvoiceNotifier
-   - Prevents "Field '_repository@60095520' has already been initialized" error
+   - Prevents "Field '\_repository@60095520' has already been initialized" error
 
 2. **Invoice Screen Type Error Fixed**
+
    - Fixed type mismatch in customer lookup within invoice list
    - Changed from `firstWhere` with incorrect `orElse` callback to try-catch pattern
    - Now properly handles missing customer IDs with "Unknown Customer" fallback
@@ -41,27 +43,31 @@ This is a hotfix release that addresses critical runtime errors discovered in v1
 ## Installation
 
 ### APK Installation
+
 ```bash
 adb install GaneshAutoParts-v1.0.1-release.apk
 ```
 
 ### Upgrading from v1.0.0
+
 This hotfix can be installed directly over v1.0.0 without losing data. All database records, settings, and PIN codes will be preserved.
 
 ## Technical Changes
 
 ### Modified Files
+
 - `lib/src/providers/item_provider.dart`
 - `lib/src/providers/customer_provider.dart`
 - `lib/src/providers/invoice_provider.dart`
 - `lib/src/screens/invoices_list_screen.dart`
 
 ### Provider Pattern Change
+
 ```dart
 // Before (v1.0.0)
 class CustomerNotifier extends Notifier<AsyncValue<List<Customer>>> {
   late final CustomerRepository _repository;
-  
+
   @override
   AsyncValue<List<Customer>> build() {
     _repository = ref.read(customerRepositoryProvider); // Error: can be called multiple times
@@ -73,7 +79,7 @@ class CustomerNotifier extends Notifier<AsyncValue<List<Customer>>> {
 // After (v1.0.1)
 class CustomerNotifier extends Notifier<AsyncValue<List<Customer>>> {
   CustomerRepository get _repository => ref.read(customerRepositoryProvider);
-  
+
   @override
   AsyncValue<List<Customer>> build() {
     _loadInitialCustomers();
@@ -83,6 +89,7 @@ class CustomerNotifier extends Notifier<AsyncValue<List<Customer>>> {
 ```
 
 ### Customer Lookup Change
+
 ```dart
 // Before (v1.0.0)
 final customer = customers.firstWhere(
@@ -104,6 +111,7 @@ try {
 ## Verification
 
 After installation, verify the fix by:
+
 1. Opening the app and entering your PIN
 2. Navigate to Customers screen - should load without errors
 3. Navigate to Invoices screen - should load without errors
@@ -121,4 +129,5 @@ For issues or questions, please create an issue on GitHub.
 ---
 
 **Git Tag:** v1.0.1  
-**Commit:** [To be added after commit]
+**Commit:** b78ab1eac685f4db16cea48e430d8e2d3521de86  
+**GitHub:** https://github.com/Princelad/ganesh-auto-parts/releases/tag/v1.0.1
