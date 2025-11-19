@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'items_list_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -16,16 +17,87 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text(
-          'Welcome to Ganesh Auto Parts',
-          style: TextStyle(fontSize: 18),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          children: [
+            _buildMenuCard(
+              context,
+              icon: Icons.inventory_2,
+              title: 'Items',
+              color: Colors.blue,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ItemsListScreen(),
+                ),
+              ),
+            ),
+            _buildMenuCard(
+              context,
+              icon: Icons.people,
+              title: 'Customers',
+              color: Colors.green,
+              onTap: () {
+                // TODO: Navigate to customers screen
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
+              },
+            ),
+            _buildMenuCard(
+              context,
+              icon: Icons.receipt_long,
+              title: 'Invoices',
+              color: Colors.orange,
+              onTap: () {
+                // TODO: Navigate to invoices screen
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
+              },
+            ),
+            _buildMenuCard(
+              context,
+              icon: Icons.bar_chart,
+              title: 'Reports',
+              color: Colors.purple,
+              onTap: () {
+                // TODO: Navigate to reports screen
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
+              },
+            ),
+          ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/about'),
-        tooltip: 'Go to About',
-        child: const Icon(Icons.arrow_forward),
+    );
+  }
+
+  Widget _buildMenuCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 4,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 64, color: color),
+            const SizedBox(height: 12),
+            Text(title, style: Theme.of(context).textTheme.titleLarge),
+          ],
+        ),
       ),
     );
   }

@@ -1,13 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ganesh_auto_parts/main.dart' as app;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ganesh_auto_parts/src/screens/home_page.dart';
 
 void main() {
-  testWidgets('app starts and shows welcome text', (WidgetTester tester) async {
-    await tester.pumpWidget(const app.MyApp());
+  testWidgets('app starts and shows home menu', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: HomePage())),
+    );
 
     // Allow frames to settle
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome to Ganesh Auto Parts'), findsOneWidget);
+    // Check if main menu items are displayed
+    expect(find.text('Items'), findsOneWidget);
+    expect(find.text('Customers'), findsOneWidget);
+    expect(find.text('Invoices'), findsOneWidget);
+    expect(find.text('Reports'), findsOneWidget);
   });
 }
