@@ -97,7 +97,18 @@ flutter test                    # Unit tests
 flutter test integration_test/  # Integration tests
 ```
 
-## 🤝 Contributing
+## � Base scaffold added
+
+I added a minimal app scaffold to help you get started quickly:
+
+- `lib/main.dart` — MaterialApp with theme and routes
+- `lib/screens/home_page.dart` — Home page with a welcome message
+- `lib/screens/about_page.dart` — Simple About page
+- `test/widget_test.dart` — Basic widget test that asserts the home welcome text
+
+Run `flutter pub get` and then `flutter run` to start the app. Run `flutter test` to execute the widget test.
+
+## �🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
