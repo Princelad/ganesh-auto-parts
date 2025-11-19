@@ -14,7 +14,7 @@ void main() {
 
     // Check if Quick Stats section is displayed
     expect(find.text('Quick Stats'), findsOneWidget);
-    
+
     // Check if main menu items are displayed (may appear in stats too)
     expect(find.text('Items'), findsWidgets);
     expect(find.text('Customers'), findsWidgets);

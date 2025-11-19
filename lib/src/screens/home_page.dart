@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'items_list_screen.dart';
 import 'customers_list_screen.dart';
 import '../widgets/dashboard_stats_widget.dart';
+import '../providers/item_provider.dart';
+import '../providers/customer_provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ganesh Auto Parts'),
@@ -37,24 +40,34 @@ class HomePage extends StatelessWidget {
                   icon: Icons.inventory_2,
                   title: 'Items',
                   color: Colors.blue,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ItemsListScreen(),
-                    ),
-                  ),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ItemsListScreen(),
+                      ),
+                    );
+                    // Refresh stats after returning
+                    ref.invalidate(itemCountProvider);
+                    ref.invalidate(lowStockItemsProvider);
+                  },
                 ),
                 _buildMenuCard(
                   context,
                   icon: Icons.people,
                   title: 'Customers',
                   color: Colors.green,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CustomersListScreen(),
-                    ),
-                  ),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CustomersListScreen(),
+                      ),
+                    );
+                    // Refresh stats after returning
+                    ref.invalidate(customerCountProvider);
+                    ref.invalidate(totalOutstandingBalanceProvider);
+                  },
                 ),
                 _buildMenuCard(
                   context,
