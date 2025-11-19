@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'items_list_screen.dart';
 import 'customers_list_screen.dart';
+import 'stock_adjustment_screen.dart';
+import 'reports_screen.dart';
 import '../widgets/dashboard_stats_widget.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
@@ -83,15 +85,32 @@ class HomePage extends ConsumerWidget {
                 ),
                 _buildMenuCard(
                   context,
+                  icon: Icons.settings_backup_restore,
+                  title: 'Stock Adjust',
+                  color: Colors.teal,
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StockAdjustmentScreen(),
+                      ),
+                    );
+                    // Refresh stats after returning
+                    ref.invalidate(itemCountProvider);
+                    ref.invalidate(lowStockItemsProvider);
+                  },
+                ),
+                _buildMenuCard(
+                  context,
                   icon: Icons.bar_chart,
                   title: 'Reports',
                   color: Colors.purple,
-                  onTap: () {
-                    // TODO: Navigate to reports screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Coming soon!')),
-                    );
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ReportsScreen(),
+                    ),
+                  ),
                 ),
               ],
             ),
