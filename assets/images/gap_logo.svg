@@ -1,0 +1,36 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#1976D2" stroke="#0D47A1" stroke-width="3"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Gear Icon Element (representing auto parts) -->
+  <g transform="translate(100, 100)">
+    <!-- Gear teeth -->
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.5"/>
+    
+    <!-- G.A.P. Text -->
+    <text x="0" y="-15" 
+          font-family="Arial, sans-serif" 
+          font-size="42" 
+          font-weight="bold" 
+          fill="#FFFFFF" 
+          text-anchor="middle">G.A.P</text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="30" 
+          font-family="Arial, sans-serif" 
+          font-size="12" 
+          font-weight="normal" 
+          fill="#FFFFFF" 
+          text-anchor="middle"
+          opacity="0.9">AUTO PARTS</text>
+  </g>
+  
+  <!-- Decorative Elements (corner gears) -->
+  <circle cx="35" cy="35" r="8" fill="#FFFFFF" opacity="0.4"/>
+  <circle cx="165" cy="35" r="8" fill="#FFFFFF" opacity="0.4"/>
+  <circle cx="35" cy="165" r="8" fill="#FFFFFF" opacity="0.4"/>
+  <circle cx="165" cy="165" r="8" fill="#FFFFFF" opacity="0.4"/>
+</svg>

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'items_list_screen.dart';
 import 'customers_list_screen.dart';
 import 'stock_adjustment_screen.dart';
@@ -18,7 +19,17 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ganesh Auto Parts'),
+        title: Row(
+          children: [
+            SvgPicture.asset(
+              'assets/images/gap_logo.svg',
+              height: 32,
+              width: 32,
+            ),
+            const SizedBox(width: 12),
+            const Text('Ganesh Auto Parts'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
