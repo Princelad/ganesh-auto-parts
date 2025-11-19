@@ -15,10 +15,31 @@ class InvoiceRepository {
       // Insert invoice
       final invoiceId = await txn.insert('invoices', invoice.toMap());
 
-      // Insert invoice items
+      // Insert invoice items and decrement stock
       for (var item in items) {
         final itemWithInvoiceId = item.copyWith(invoiceId: invoiceId);
         await txn.insert('invoice_items', itemWithInvoiceId.toMap());
+
+        // Decrement stock for each item
+        await txn.rawUpdate(
+          '''
+          UPDATE items 
+          SET stock = stock - ?, updatedAt = ? 
+          WHERE id = ?
+          ''',
+          [item.qty, DateTime.now().millisecondsSinceEpoch, item.itemId],
+        );
+
+        // Log the stock change
+        await txn.insert('change_logs', {
+          'entity': 'Item',
+          'entityId': item.itemId,
+          'action': 'update',
+          'payload':
+              '{"field":"stock","change":-${item.qty},"reason":"Invoice #${invoice.invoiceNo}"}',
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'synced': 0,
+        });
       }
 
       // Update customer balance if customer is specified

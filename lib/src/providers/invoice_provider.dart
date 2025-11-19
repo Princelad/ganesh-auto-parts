@@ -6,11 +6,10 @@ import 'database_provider.dart';
 
 /// Notifier for managing invoices
 class InvoiceNotifier extends Notifier<AsyncValue<List<Invoice>>> {
-  late final InvoiceRepository _repository;
+  InvoiceRepository get _repository => ref.read(invoiceRepositoryProvider);
 
   @override
   AsyncValue<List<Invoice>> build() {
-    _repository = ref.read(invoiceRepositoryProvider);
     loadInvoices();
     return const AsyncValue.loading();
   }

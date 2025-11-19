@@ -5,9 +5,11 @@ import 'customers_list_screen.dart';
 import 'stock_adjustment_screen.dart';
 import 'reports_screen.dart';
 import 'csv_export_import_screen.dart';
+import 'invoices_list_screen.dart';
 import '../widgets/dashboard_stats_widget.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
+import '../providers/invoice_provider.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -74,18 +76,6 @@ class HomePage extends ConsumerWidget {
                 ),
                 _buildMenuCard(
                   context,
-                  icon: Icons.receipt_long,
-                  title: 'Invoices',
-                  color: Colors.orange,
-                  onTap: () {
-                    // TODO: Navigate to invoices screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Coming soon!')),
-                    );
-                  },
-                ),
-                _buildMenuCard(
-                  context,
                   icon: Icons.settings_backup_restore,
                   title: 'Stock Adjust',
                   color: Colors.teal,
@@ -112,6 +102,29 @@ class HomePage extends ConsumerWidget {
                       builder: (context) => const ReportsScreen(),
                     ),
                   ),
+                ),
+                _buildMenuCard(
+                  context,
+                  icon: Icons.receipt_long,
+                  title: 'Invoices',
+                  color: Colors.indigo,
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InvoicesListScreen(),
+                      ),
+                    );
+                    // Refresh all data when returning from invoices
+                    ref.invalidate(invoiceProvider);
+                    ref.invalidate(invoiceCountProvider);
+                    ref.invalidate(itemProvider);
+                    ref.invalidate(itemCountProvider);
+                    ref.invalidate(customerProvider);
+                    ref.invalidate(customerCountProvider);
+                    ref.invalidate(totalOutstandingBalanceProvider);
+                    ref.invalidate(lowStockItemsProvider);
+                  },
                 ),
                 _buildMenuCard(
                   context,
