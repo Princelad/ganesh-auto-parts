@@ -1,129 +1,301 @@
-# Ganesh Auto Parts
+# Ganesh Auto Parts - ERP Application
 
-A comprehensive Flutter-based application for managing auto parts inventory, sales, purchases, and customer relationships with offline-first capabilities and real-time synchronization.
+<div align="center">
+  
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Android-green.svg)
+![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)
+![License](https://img.shields.io/badge/license-Private-red.svg)
 
-## 🚀 Features
+**Complete offline-first ERP solution for auto parts businesses**
 
-- **Inventory Management**: Track parts, categories, stock levels, and locations
-- **Sales & Invoicing**: Create invoices, manage payments, and track sales history
-- **Purchase Management**: Handle purchase orders and supplier relationships
-- **Customer Management**: Maintain customer records and transaction history
-- **Offline-First**: Full functionality without internet connectivity
-- **Real-time Sync**: Automatic synchronization when online
-- **Multi-platform**: Supports Android, Web, and other platforms
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](#-documentation)
 
-## 📋 Prerequisites
+</div>
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (latest stable version)
-- Dart SDK (included with Flutter)
-- Android Studio / VS Code with Flutter extensions
-- Git
+## 📱 Overview
 
-## 🛠️ Installation
+Ganesh Auto Parts is a comprehensive Android ERP application designed specifically for auto parts businesses. Built with Flutter and SQLite, it provides complete inventory management, customer tracking, invoicing, and business analytics - all working offline without any internet dependency.
 
-1. **Clone the repository:**
+## ✨ Features
 
-   ```zsh
-   git clone https://github.com/yourusername/ganesh_auto_parts.git
-   cd ganesh_auto_parts
-   ```
+### 📦 Inventory Management
 
-2. **Install dependencies:**
+- Complete items database with SKU tracking
+- Stock level monitoring with reorder alerts
+- Company/brand organization
+- Real-time stock updates
+- Search and filter capabilities
 
-   ```zsh
-   flutter pub get
-   ```
+### 👥 Customer Management
 
-3. **Run the application:**
+- Customer database with contact details
+- Balance tracking (accounts receivable)
+- Transaction history
+- Customer reports
 
-   ```zsh
-   flutter run
-   ```
+### 🧾 Invoicing
 
-   For specific platforms:
+- Create multi-item invoices
+- Automatic invoice numbering
+- Stock deduction on invoice creation
+- Payment recording (full/partial)
+- Payment status tracking
+- Invoice search and filtering
 
-   ```zsh
-   flutter run -d android    # For Android
-   flutter run -d chrome     # For Web
-   ```
+### 📊 Reports & Analytics
 
-## 📁 Project Structure
+- Sales summary reports
+- Low stock alerts
+- Customer balance reports
+- Inventory overview
+- Date range filtering
+
+### 💾 Data Management
+
+- CSV export/import for items, customers, invoices
+- Full database backup to JSON
+- Restore from backup files
+- Share backups via email/cloud
+
+### 🔐 Security
+
+- PIN authentication (4-6 digits)
+- SHA256 encryption
+- App startup protection
+- Secure credential storage
+
+### ☁️ Sync Ready
+
+- Change log tracking
+- Foundation for cloud sync
+- Multi-device ready architecture
+
+## 🚀 Installation
+
+### Prerequisites
+
+- Android device running Android 5.0 (API 21) or higher
+- ~100 MB free storage space
+
+### Install from APK
+
+1. Download `GaneshAutoParts-v1.0.0-release.apk` from the `releases/` folder
+2. Transfer to your Android device
+3. Enable "Install from Unknown Sources" in Settings
+4. Tap the APK file to install
+5. Open "Ganesh Auto Parts" from your app drawer
+
+### Build from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/Princelad/ganesh-auto-parts.git
+cd ganesh-auto-parts
+
+# Install dependencies
+flutter pub get
+
+# Run in debug mode
+flutter run
+
+# Build release APK
+flutter build apk --release
+
+# Build release App Bundle
+flutter build appbundle --release
+```
+
+## 📖 Usage
+
+### First Launch
+
+1. Open the app
+2. No PIN is set by default - go to Security to set up
+3. Start by adding items to your inventory
+4. Add customers (optional)
+5. Create invoices to record sales
+
+### Creating an Invoice
+
+1. Tap **Invoices** on home screen
+2. Tap the **+** button
+3. Select customer (optional)
+4. Add items with quantities
+5. System auto-calculates totals
+6. Enter payment received
+7. Save invoice
+
+### Taking Backups
+
+1. Tap **Backup & Restore** on home screen
+2. Tap **Create Backup** or **Create & Share**
+3. Backups saved to device storage
+4. Share to cloud storage for safety
+
+### Setting PIN Security
+
+1. Tap **Security** on home screen
+2. Toggle PIN switch ON
+3. Enter 4-6 digit PIN
+4. Confirm PIN
+5. PIN required on every app launch
+
+## 🏗️ Technology Stack
+
+- **Framework**: Flutter (Dart)
+- **Database**: SQLite (sqflite)
+- **State Management**: Riverpod 3.0.3
+- **Architecture**: Offline-first, Repository pattern
+- **Platform**: Android only
+
+## 📂 Project Structure
 
 ```
 lib/
-├── main.dart              # Application entry point
-├── core/                  # Core functionality
-│   ├── constants/        # App-wide constants
-│   ├── utils/           # Utility functions
-│   └── theme/           # App theme configuration
-├── data/                 # Data layer
-│   ├── models/          # Data models
-│   ├── repositories/    # Repository implementations
-│   └── services/        # API and local services
-├── domain/              # Business logic layer
-│   ├── entities/        # Domain entities
-│   └── repositories/    # Repository interfaces
-└── presentation/        # UI layer
-    ├── screens/         # Application screens
-    ├── widgets/         # Reusable widgets
-    └── providers/       # State management
+├── main.dart                    # App entry point
+└── src/
+    ├── db/                      # Database layer
+    │   ├── database_helper.dart
+    │   ├── item_repository.dart
+    │   ├── customer_repository.dart
+    │   └── invoice_repository.dart
+    ├── models/                  # Data models
+    │   ├── item.dart
+    │   ├── customer.dart
+    │   ├── invoice.dart
+    │   └── invoice_item.dart
+    ├── providers/               # Riverpod providers
+    │   ├── item_provider.dart
+    │   ├── customer_provider.dart
+    │   └── invoice_provider.dart
+    ├── screens/                 # UI screens
+    │   ├── home_page.dart
+    │   ├── items_list_screen.dart
+    │   ├── invoice_form_screen.dart
+    │   └── ...
+    ├── services/                # Business logic
+    │   ├── csv_service.dart
+    │   ├── backup_service.dart
+    │   └── auth_service.dart
+    └── widgets/                 # Reusable widgets
+        └── dashboard_stats_widget.dart
 ```
 
-## 🏗️ Architecture
+## 🔧 Configuration
 
-This project follows Clean Architecture principles with:
+### Database
 
-- **Presentation Layer**: UI components and state management
-- **Domain Layer**: Business logic and use cases
-- **Data Layer**: Data sources and repository implementations
+- Location: `/data/data/com.example.ganesh_auto_parts/databases/erp_db.sqlite`
+- Auto-created on first launch
+- No manual setup required
 
-State management is handled using Provider/Riverpod for reactive updates.
+### Backups
 
-## 🔄 Offline-First & Sync
+- Location: `/storage/emulated/0/Android/data/.../files/Documents/`
+- Format: JSON
+- Naming: `gap_backup_<timestamp>.json`
+- Auto-cleanup: Keeps last 5 backups
 
-The application uses an offline-first approach:
+## 📊 Database Schema
 
-- All data is stored locally using SQLite/Hive
-- Changes are queued for synchronization
-- Automatic sync when connection is available
-- Conflict resolution for concurrent updates
+### Items
 
-## 🧪 Testing
-
-Run tests with:
-
-```zsh
-flutter test                    # Unit tests
-flutter test integration_test/  # Integration tests
+```sql
+id, sku, name, company, unitPrice, stock, reorderLevel, createdAt, updatedAt
 ```
 
-## � Base scaffold added
+### Customers
 
-I added a minimal app scaffold to help you get started quickly:
+```sql
+id, name, phone, address, balance, createdAt, updatedAt
+```
 
-- `lib/main.dart` — MaterialApp with theme and routes
-- `lib/screens/home_page.dart` — Home page with a welcome message
-- `lib/screens/about_page.dart` — Simple About page
-- `test/widget_test.dart` — Basic widget test that asserts the home welcome text
+### Invoices
 
-Run `flutter pub get` and then `flutter run` to start the app. Run `flutter test` to execute the widget test.
+```sql
+id, invoiceNo, customerId, total, paid, date, createdAt, synced
+```
 
-## �🤝 Contributing
+### Invoice Items
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+```sql
+id, invoiceId, itemId, qty, unitPrice, lineTotal
+```
+
+## 🤝 Contributing
+
+This is a private project. For questions or suggestions, please contact the development team.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary software. All rights reserved.
+
+## 👨‍💻 Development
+
+### Running Tests
+
+```bash
+flutter test
+```
+
+### Code Generation
+
+```bash
+flutter pub run build_runner build
+```
+
+### Clean Build
+
+```bash
+flutter clean
+flutter pub get
+flutter run
+```
 
 ## 📞 Support
 
-For issues and questions, please open an issue in the GitHub repository.
+For support or queries:
 
-## 🙏 Acknowledgments
+- Check the in-app **About** page
+- Review `PROJECT_DOCUMENTATION.md` for detailed information
+- Check `BUILD_INFO.txt` in releases folder
 
-Built with [Flutter](https://flutter.dev/) - Google's UI toolkit for building beautiful, natively compiled applications.
+## 🎯 Roadmap
+
+### Upcoming Features
+
+- [ ] Barcode scanner for quick item lookup
+- [ ] PDF invoice generation
+- [ ] Advanced charts and analytics
+- [ ] Tax/GST support
+- [ ] Expense tracking
+- [ ] Cloud sync with server
+- [ ] Multi-user support
+- [ ] SMS/Email notifications
+
+## 📈 Version History
+
+### v1.0.0 (November 19, 2025)
+
+- ✅ Initial release
+- ✅ Complete inventory management
+- ✅ Customer management
+- ✅ Invoice management with stock deduction
+- ✅ Stock adjustment
+- ✅ Reports & analytics (4 types)
+- ✅ CSV export/import
+- ✅ Database backup/restore
+- ✅ PIN security
+- ✅ Sync foundation
+- ✅ Custom branding with logo
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Flutter**
+
+_Making business management simple and efficient_
+
+</div>

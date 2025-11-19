@@ -163,6 +163,13 @@ class HomePage extends ConsumerWidget {
                   color: Colors.brown,
                   onTap: () => Navigator.pushNamed(context, '/backup'),
                 ),
+                _buildMenuCard(
+                  context,
+                  icon: Icons.cloud_sync,
+                  title: 'Sync Status',
+                  color: Colors.cyan,
+                  onTap: () => Navigator.pushNamed(context, '/sync'),
+                ),
               ],
             ),
           ),
