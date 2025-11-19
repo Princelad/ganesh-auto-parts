@@ -4,6 +4,7 @@ import 'items_list_screen.dart';
 import 'customers_list_screen.dart';
 import 'stock_adjustment_screen.dart';
 import 'reports_screen.dart';
+import 'csv_export_import_screen.dart';
 import '../widgets/dashboard_stats_widget.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
@@ -109,6 +110,18 @@ class HomePage extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const ReportsScreen(),
+                    ),
+                  ),
+                ),
+                _buildMenuCard(
+                  context,
+                  icon: Icons.upload_file,
+                  title: 'CSV Export/Import',
+                  color: Colors.teal,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CsvExportImportScreen(),
                     ),
                   ),
                 ),
