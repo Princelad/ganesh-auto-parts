@@ -363,4 +363,108 @@ class InvoiceRepository {
 
     return 'INV-0001';
   }
+
+  /// Get GST summary for a date range
+  Future<Map<String, dynamic>> getGstSummary(int startDate, int endDate) async {
+    final database = await _db.database;
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        COUNT(*) as invoiceCount,
+        SUM(subtotal) as totalSubtotal,
+        SUM(taxAmount) as totalTax,
+        SUM(total) as totalAmount
+      FROM invoices 
+      WHERE date >= ? AND date <= ?
+    ''',
+      [startDate, endDate],
+    );
+
+    if (result.isEmpty || result.first['invoiceCount'] == 0) {
+      return {
+        'invoiceCount': 0,
+        'totalSubtotal': 0.0,
+        'totalTax': 0.0,
+        'totalAmount': 0.0,
+      };
+    }
+
+    final row = result.first;
+    return {
+      'invoiceCount': row['invoiceCount'] as int,
+      'totalSubtotal': (row['totalSubtotal'] as num?)?.toDouble() ?? 0.0,
+      'totalTax': (row['totalTax'] as num?)?.toDouble() ?? 0.0,
+      'totalAmount': (row['totalAmount'] as num?)?.toDouble() ?? 0.0,
+    };
+  }
+
+  /// Get GST breakdown by tax rate for a date range
+  Future<List<Map<String, dynamic>>> getGstBreakdownByRate(
+    int startDate,
+    int endDate,
+  ) async {
+    final database = await _db.database;
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        taxRate,
+        COUNT(*) as invoiceCount,
+        SUM(subtotal) as totalSubtotal,
+        SUM(taxAmount) as totalTax,
+        SUM(total) as totalAmount
+      FROM invoices 
+      WHERE date >= ? AND date <= ?
+      GROUP BY taxRate
+      ORDER BY taxRate DESC
+    ''',
+      [startDate, endDate],
+    );
+
+    return result.map((row) {
+      return {
+        'taxRate': (row['taxRate'] as num?)?.toDouble() ?? 0.0,
+        'invoiceCount': row['invoiceCount'] as int,
+        'totalSubtotal': (row['totalSubtotal'] as num?)?.toDouble() ?? 0.0,
+        'totalTax': (row['totalTax'] as num?)?.toDouble() ?? 0.0,
+        'totalAmount': (row['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      };
+    }).toList();
+  }
+
+  /// Get monthly GST summary for the last N months
+  Future<List<Map<String, dynamic>>> getMonthlyGstSummary(int months) async {
+    final database = await _db.database;
+    final now = DateTime.now();
+    final startDate = DateTime(
+      now.year,
+      now.month - months + 1,
+      1,
+    ).millisecondsSinceEpoch;
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        strftime('%Y-%m', datetime(date/1000, 'unixepoch')) as month,
+        COUNT(*) as invoiceCount,
+        SUM(subtotal) as totalSubtotal,
+        SUM(taxAmount) as totalTax,
+        SUM(total) as totalAmount
+      FROM invoices 
+      WHERE date >= ?
+      GROUP BY month
+      ORDER BY month DESC
+    ''',
+      [startDate],
+    );
+
+    return result.map((row) {
+      return {
+        'month': row['month'] as String,
+        'invoiceCount': row['invoiceCount'] as int,
+        'totalSubtotal': (row['totalSubtotal'] as num?)?.toDouble() ?? 0.0,
+        'totalTax': (row['totalTax'] as num?)?.toDouble() ?? 0.0,
+        'totalAmount': (row['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      };
+    }).toList();
+  }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'low_stock_report_screen.dart';
 import 'customer_balance_report_screen.dart';
 import 'sales_summary_report_screen.dart';
+import 'gst_report_screen.dart';
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
@@ -119,6 +120,21 @@ class ReportsScreen extends ConsumerWidget {
             subtitle: 'Most popular products',
             color: Colors.amber,
             onTap: () => _showComingSoon(context),
+          ),
+          const SizedBox(height: 24),
+          // Tax Reports Section
+          _buildSectionHeader(context, 'Tax Reports', Icons.account_balance),
+          const SizedBox(height: 12),
+          _buildReportCard(
+            context,
+            icon: Icons.receipt_long,
+            title: 'GST/Tax Collection',
+            subtitle: 'Tax collected by period and rate',
+            color: Colors.deepOrange,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GstReportScreen()),
+            ),
           ),
         ],
       ),
