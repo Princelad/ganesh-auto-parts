@@ -4,6 +4,10 @@ import 'low_stock_report_screen.dart';
 import 'customer_balance_report_screen.dart';
 import 'sales_summary_report_screen.dart';
 import 'gst_report_screen.dart';
+import 'stock_valuation_report_screen.dart';
+import 'top_selling_items_report_screen.dart';
+import 'sales_by_period_report_screen.dart';
+import 'customer_insights_report_screen.dart';
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
@@ -58,7 +62,12 @@ class ReportsScreen extends ConsumerWidget {
             title: 'Stock Valuation',
             subtitle: 'Current inventory value',
             color: Colors.blue,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const StockValuationReportScreen(),
+              ),
+            ),
           ),
           const SizedBox(height: 24),
           // Customer Reports Section
@@ -81,10 +90,15 @@ class ReportsScreen extends ConsumerWidget {
           _buildReportCard(
             context,
             icon: Icons.people_outline,
-            title: 'Customer List',
-            subtitle: 'All customers with details',
+            title: 'Customer Insights',
+            subtitle: 'Top customers and buying patterns',
             color: Colors.green,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CustomerInsightsReportScreen(),
+              ),
+            ),
           ),
           const SizedBox(height: 24),
           // Sales Reports Section
@@ -110,7 +124,12 @@ class ReportsScreen extends ConsumerWidget {
             title: 'Sales by Period',
             subtitle: 'Daily, weekly, monthly sales',
             color: Colors.teal,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SalesByPeriodReportScreen(),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           _buildReportCard(
@@ -119,7 +138,12 @@ class ReportsScreen extends ConsumerWidget {
             title: 'Top Selling Items',
             subtitle: 'Most popular products',
             color: Colors.amber,
-            onTap: () => _showComingSoon(context),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TopSellingItemsReportScreen(),
+              ),
+            ),
           ),
           const SizedBox(height: 24),
           // Tax Reports Section
@@ -216,11 +240,5 @@ class ReportsScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
   }
 }

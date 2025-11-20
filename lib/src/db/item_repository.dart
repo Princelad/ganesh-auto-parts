@@ -212,4 +212,72 @@ class ItemRepository {
 
     return maps.isNotEmpty;
   }
+
+  /// Get stock valuation summary
+  Future<Map<String, dynamic>> getStockValuationSummary() async {
+    final database = await _db.database;
+    final result = await database.rawQuery('''
+      SELECT 
+        COUNT(*) as itemCount,
+        SUM(stock) as totalStock,
+        SUM(stock * unitPrice) as totalValue,
+        SUM(CASE WHEN stock <= reorderLevel THEN stock * unitPrice ELSE 0 END) as lowStockValue
+      FROM items
+    ''');
+
+    if (result.isEmpty) {
+      return {
+        'itemCount': 0,
+        'totalStock': 0,
+        'totalValue': 0.0,
+        'lowStockValue': 0.0,
+      };
+    }
+
+    final row = result.first;
+    return {
+      'itemCount': row['itemCount'] as int,
+      'totalStock': row['totalStock'] as int? ?? 0,
+      'totalValue': (row['totalValue'] as num?)?.toDouble() ?? 0.0,
+      'lowStockValue': (row['lowStockValue'] as num?)?.toDouble() ?? 0.0,
+    };
+  }
+
+  /// Get stock valuation by company
+  Future<List<Map<String, dynamic>>> getStockValuationByCompany() async {
+    final database = await _db.database;
+    final result = await database.rawQuery('''
+      SELECT 
+        company,
+        COUNT(*) as itemCount,
+        SUM(stock) as totalStock,
+        SUM(stock * unitPrice) as totalValue
+      FROM items
+      WHERE company IS NOT NULL AND company != ''
+      GROUP BY company
+      ORDER BY totalValue DESC
+    ''');
+
+    return result.map((row) {
+      return {
+        'company': row['company'] as String,
+        'itemCount': row['itemCount'] as int,
+        'totalStock': row['totalStock'] as int? ?? 0,
+        'totalValue': (row['totalValue'] as num?)?.toDouble() ?? 0.0,
+      };
+    }).toList();
+  }
+
+  /// Get all unique companies
+  Future<List<String>> getAllCompanies() async {
+    final database = await _db.database;
+    final result = await database.rawQuery('''
+      SELECT DISTINCT company 
+      FROM items 
+      WHERE company IS NOT NULL AND company != ''
+      ORDER BY company ASC
+    ''');
+
+    return result.map((row) => row['company'] as String).toList();
+  }
 }

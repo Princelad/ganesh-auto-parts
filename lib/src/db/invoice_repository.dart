@@ -467,4 +467,218 @@ class InvoiceRepository {
       };
     }).toList();
   }
+
+  /// Get top selling items for a date range
+  Future<List<Map<String, dynamic>>> getTopSellingItems({
+    int? startDate,
+    int? endDate,
+    int limit = 50,
+  }) async {
+    final database = await _db.database;
+
+    String dateFilter = '';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      dateFilter = 'WHERE i.date >= ? AND i.date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        it.id,
+        it.name,
+        it.sku,
+        it.company,
+        it.unitPrice,
+        SUM(ii.qty) as totalQtySold,
+        SUM(ii.lineTotal) as totalRevenue,
+        COUNT(DISTINCT ii.invoiceId) as invoiceCount,
+        AVG(ii.unitPrice) as avgSellingPrice
+      FROM invoice_items ii
+      INNER JOIN items it ON ii.itemId = it.id
+      INNER JOIN invoices i ON ii.invoiceId = i.id
+      $dateFilter
+      GROUP BY it.id
+      ORDER BY totalQtySold DESC
+      LIMIT ?
+    ''',
+      [...args, limit],
+    );
+
+    return result.map((row) {
+      return {
+        'itemId': row['id'] as int,
+        'name': row['name'] as String,
+        'sku': row['sku'] as String,
+        'company': row['company'] as String?,
+        'unitPrice': (row['unitPrice'] as num).toDouble(),
+        'totalQtySold': row['totalQtySold'] as int? ?? 0,
+        'totalRevenue': (row['totalRevenue'] as num?)?.toDouble() ?? 0.0,
+        'invoiceCount': row['invoiceCount'] as int? ?? 0,
+        'avgSellingPrice': (row['avgSellingPrice'] as num?)?.toDouble() ?? 0.0,
+      };
+    }).toList();
+  }
+
+  /// Get sales by period (daily, weekly, monthly)
+  Future<List<Map<String, dynamic>>> getSalesByPeriod({
+    required String period, // 'day', 'week', 'month'
+    int? startDate,
+    int? endDate,
+  }) async {
+    final database = await _db.database;
+
+    String dateFormat;
+    switch (period.toLowerCase()) {
+      case 'day':
+        dateFormat = '%Y-%m-%d';
+        break;
+      case 'week':
+        dateFormat = '%Y-W%W';
+        break;
+      case 'month':
+        dateFormat = '%Y-%m';
+        break;
+      default:
+        dateFormat = '%Y-%m-%d';
+    }
+
+    String dateFilter = '';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      dateFilter = 'WHERE date >= ? AND date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        strftime('$dateFormat', datetime(date/1000, 'unixepoch')) as period,
+        COUNT(*) as invoiceCount,
+        SUM(subtotal) as totalSubtotal,
+        SUM(taxAmount) as totalTax,
+        SUM(total) as totalRevenue,
+        SUM(paid) as totalCollected
+      FROM invoices
+      $dateFilter
+      GROUP BY period
+      ORDER BY period DESC
+    ''',
+      args,
+    );
+
+    return result.map((row) {
+      return {
+        'period': row['period'] as String,
+        'invoiceCount': row['invoiceCount'] as int,
+        'totalSubtotal': (row['totalSubtotal'] as num?)?.toDouble() ?? 0.0,
+        'totalTax': (row['totalTax'] as num?)?.toDouble() ?? 0.0,
+        'totalRevenue': (row['totalRevenue'] as num?)?.toDouble() ?? 0.0,
+        'totalCollected': (row['totalCollected'] as num?)?.toDouble() ?? 0.0,
+      };
+    }).toList();
+  }
+
+  /// Get sales by company/brand for category analysis
+  Future<List<Map<String, dynamic>>> getSalesByCompany({
+    int? startDate,
+    int? endDate,
+  }) async {
+    final database = await _db.database;
+
+    String dateFilter = '';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      dateFilter = 'WHERE i.date >= ? AND i.date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        it.company,
+        COUNT(DISTINCT ii.invoiceId) as invoiceCount,
+        SUM(ii.qty) as totalQtySold,
+        SUM(ii.lineTotal) as totalRevenue,
+        COUNT(DISTINCT it.id) as uniqueItems
+      FROM invoice_items ii
+      INNER JOIN items it ON ii.itemId = it.id
+      INNER JOIN invoices i ON ii.invoiceId = i.id
+      $dateFilter
+      WHERE it.company IS NOT NULL AND it.company != ''
+      GROUP BY it.company
+      ORDER BY totalRevenue DESC
+    ''',
+      args,
+    );
+
+    return result.map((row) {
+      return {
+        'company': row['company'] as String,
+        'invoiceCount': row['invoiceCount'] as int? ?? 0,
+        'totalQtySold': row['totalQtySold'] as int? ?? 0,
+        'totalRevenue': (row['totalRevenue'] as num?)?.toDouble() ?? 0.0,
+        'uniqueItems': row['uniqueItems'] as int? ?? 0,
+      };
+    }).toList();
+  }
+
+  /// Get customer purchase summary
+  Future<List<Map<String, dynamic>>> getCustomerPurchaseSummary({
+    int? startDate,
+    int? endDate,
+    int limit = 50,
+  }) async {
+    final database = await _db.database;
+
+    String dateFilter = '';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      dateFilter = 'AND i.date >= ? AND i.date <= ?';
+      args.addAll([startDate, endDate]);
+    }
+
+    args.add(limit);
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        c.id,
+        c.name,
+        c.phone,
+        c.balance,
+        COUNT(i.id) as invoiceCount,
+        SUM(i.total) as totalRevenue,
+        SUM(i.paid) as totalPaid,
+        AVG(i.total) as avgOrderValue,
+        MAX(i.date) as lastPurchaseDate
+      FROM customers c
+      INNER JOIN invoices i ON c.id = i.customerId
+      WHERE i.customerId IS NOT NULL $dateFilter
+      GROUP BY c.id
+      ORDER BY totalRevenue DESC
+      LIMIT ?
+    ''',
+      args,
+    );
+
+    return result.map((row) {
+      return {
+        'customerId': row['id'] as int,
+        'name': row['name'] as String,
+        'phone': row['phone'] as String,
+        'balance': (row['balance'] as num).toDouble(),
+        'invoiceCount': row['invoiceCount'] as int? ?? 0,
+        'totalRevenue': (row['totalRevenue'] as num?)?.toDouble() ?? 0.0,
+        'totalPaid': (row['totalPaid'] as num?)?.toDouble() ?? 0.0,
+        'avgOrderValue': (row['avgOrderValue'] as num?)?.toDouble() ?? 0.0,
+        'lastPurchaseDate': row['lastPurchaseDate'] as int,
+      };
+    }).toList();
+  }
 }

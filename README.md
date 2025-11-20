@@ -2,7 +2,7 @@
 
 <div align="center">
   
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.27.1-02569B?logo=flutter)
 ![License](https://img.shields.io/badge/license-Private-red.svg)
@@ -49,10 +49,15 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 
 ### 📊 Reports & Analytics
 
+- **Comprehensive Reports Suite** (NEW in v1.3.0)
+  - **Stock Valuation Report** - Total inventory value with company breakdown
+  - **Top Selling Items Report** - Ranked products by quantity sold
+  - **Sales by Period Report** - Daily, weekly, monthly sales analysis
+  - **Customer Insights Report** - Top customers and buying patterns
 - Sales summary reports
 - Low stock alerts
 - Customer balance reports
-- **GST/Tax collection reports** (NEW in v1.2.0)
+- **GST/Tax collection reports**
   - Tax collection by period
   - Breakdown by tax rate
   - Monthly trends

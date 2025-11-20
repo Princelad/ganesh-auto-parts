@@ -4,6 +4,9 @@ import '../providers/invoice_provider.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
 import '../utils/currency_helper.dart';
+import 'sales_by_period_report_screen.dart';
+import 'top_selling_items_report_screen.dart';
+import 'customer_insights_report_screen.dart';
 
 class SalesSummaryReportScreen extends ConsumerWidget {
   const SalesSummaryReportScreen({super.key});
@@ -146,7 +149,12 @@ class SalesSummaryReportScreen extends ConsumerWidget {
               icon: Icons.calendar_today,
               title: 'Sales Period Reports',
               subtitle: 'Daily, weekly, and monthly sales analysis',
-              onTap: () => _showComingSoon(context),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SalesByPeriodReportScreen(),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             _buildInfoCard(
@@ -154,15 +162,12 @@ class SalesSummaryReportScreen extends ConsumerWidget {
               icon: Icons.trending_up,
               title: 'Top Selling Items',
               subtitle: 'Most popular products by quantity sold',
-              onTap: () => _showComingSoon(context),
-            ),
-            const SizedBox(height: 12),
-            _buildInfoCard(
-              context,
-              icon: Icons.pie_chart,
-              title: 'Category Analysis',
-              subtitle: 'Sales distribution by product category',
-              onTap: () => _showComingSoon(context),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TopSellingItemsReportScreen(),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             _buildInfoCard(
@@ -170,7 +175,12 @@ class SalesSummaryReportScreen extends ConsumerWidget {
               icon: Icons.account_circle,
               title: 'Customer Insights',
               subtitle: 'Top customers and buying patterns',
-              onTap: () => _showComingSoon(context),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CustomerInsightsReportScreen(),
+                ),
+              ),
             ),
           ],
         ),
@@ -277,11 +287,5 @@ class SalesSummaryReportScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
   }
 }

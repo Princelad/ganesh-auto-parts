@@ -5,6 +5,51 @@ All notable changes to Ganesh Auto Parts ERP will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-01-20
+
+### Added
+
+- **Comprehensive Reports Suite** - Major analytics and business intelligence release
+  - **Stock Valuation Report**
+    - Total inventory value with item count and total stock quantity
+    - Breakdown by company/brand with percentages
+    - Low stock items section with value analysis
+    - Pull-to-refresh and real-time data
+  - **Top Selling Items Report**
+    - Ranked list of top 50 items by quantity sold
+    - Medal icons for top 3 performers
+    - Date range filtering with quick filters (Last 7 Days, Last Month, Last Quarter, Last Year)
+    - Revenue, quantity sold, invoice count, and average price per item
+    - Amber color scheme for "star" products
+  - **Sales by Period Report**
+    - Toggle between daily, weekly, and monthly views
+    - Period-based sales cards with revenue breakdown
+    - Collected amount and tax analysis per period
+    - Date range selection
+    - Teal color scheme
+  - **Customer Insights Report**
+    - Top 50 customers by revenue
+    - Purchase frequency and average order value
+    - Last purchase date with relative time display
+    - Outstanding balance highlighting
+    - Customer ranking with medals for top 3
+    - Green color scheme
+- New repository methods in `InvoiceRepository`:
+  - `getTopSellingItems()` - Ranked items by quantity sold with date filtering
+  - `getSalesByPeriod()` - Daily/weekly/monthly sales aggregation
+  - `getCustomerPurchaseSummary()` - Top customers with buying patterns
+- New repository methods in `ItemRepository`:
+  - `getStockValuationSummary()` - Total inventory value and counts
+  - `getStockValuationByCompany()` - Company-wise stock valuation
+  - `getAllCompanies()` - List of unique companies
+- Enhanced navigation in Reports and Sales Summary screens
+
+### Changed
+
+- Reports screen: Updated "Customer List" to "Customer Insights" with enhanced functionality
+- All "Coming Soon" report placeholders now functional
+- Version bumped to 1.3.0+5
+
 ## [1.2.0] - 2025-11-20
 
 ### Added
