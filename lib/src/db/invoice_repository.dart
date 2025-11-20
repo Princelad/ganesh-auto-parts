@@ -553,8 +553,7 @@ class InvoiceRepository {
       args = [startDate, endDate];
     }
 
-    final result = await database.rawQuery(
-      '''
+    final result = await database.rawQuery('''
       SELECT 
         strftime('$dateFormat', datetime(date/1000, 'unixepoch')) as period,
         COUNT(*) as invoiceCount,
@@ -566,9 +565,7 @@ class InvoiceRepository {
       $dateFilter
       GROUP BY period
       ORDER BY period DESC
-    ''',
-      args,
-    );
+    ''', args);
 
     return result.map((row) {
       return {
@@ -597,8 +594,7 @@ class InvoiceRepository {
       args = [startDate, endDate];
     }
 
-    final result = await database.rawQuery(
-      '''
+    final result = await database.rawQuery('''
       SELECT 
         it.company,
         COUNT(DISTINCT ii.invoiceId) as invoiceCount,
@@ -612,9 +608,7 @@ class InvoiceRepository {
       WHERE it.company IS NOT NULL AND it.company != ''
       GROUP BY it.company
       ORDER BY totalRevenue DESC
-    ''',
-      args,
-    );
+    ''', args);
 
     return result.map((row) {
       return {
@@ -645,8 +639,7 @@ class InvoiceRepository {
 
     args.add(limit);
 
-    final result = await database.rawQuery(
-      '''
+    final result = await database.rawQuery('''
       SELECT 
         c.id,
         c.name,
@@ -663,9 +656,7 @@ class InvoiceRepository {
       GROUP BY c.id
       ORDER BY totalRevenue DESC
       LIMIT ?
-    ''',
-      args,
-    );
+    ''', args);
 
     return result.map((row) {
       return {

@@ -73,108 +73,97 @@ class _StockValuationReportScreenState
       body: _isLoading
           ? const LoadingWidget(message: 'Calculating stock value...')
           : _error != null
-              ? ErrorStateWidget(
-                  error: _error!,
-                  onRetry: _loadValuationData,
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadValuationData,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // Info card
-                      Card(
-                        color: Colors.blue.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.blue.shade700,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Current inventory valuation based on stock quantity and unit prices.',
-                                  style: TextStyle(color: Colors.blue.shade700),
-                                ),
-                              ),
-                            ],
+          ? ErrorStateWidget(error: _error!, onRetry: _loadValuationData)
+          : RefreshIndicator(
+              onRefresh: _loadValuationData,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Info card
+                  Card(
+                    color: Colors.blue.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.blue.shade700),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Current inventory valuation based on stock quantity and unit prices.',
+                              style: TextStyle(color: Colors.blue.shade700),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-
-                      // Summary section
-                      if (_summary != null) ...[
-                        _buildSectionHeader('Valuation Summary'),
-                        const SizedBox(height: 12),
-                        _buildSummaryCard(),
-                        const SizedBox(height: 24),
-                      ],
-
-                      // Company breakdown
-                      if (_companyBreakdown != null &&
-                          _companyBreakdown!.isNotEmpty) ...[
-                        _buildSectionHeader('Breakdown by Company'),
-                        const SizedBox(height: 12),
-                        ..._companyBreakdown!.map(_buildCompanyCard),
-                        const SizedBox(height: 24),
-                      ],
-
-                      // Low stock items
-                      if (_lowStockItems != null &&
-                          _lowStockItems!.isNotEmpty) ...[
-                        _buildSectionHeader('Low Stock Items'),
-                        const SizedBox(height: 12),
-                        _buildLowStockSummary(),
-                        const SizedBox(height: 12),
-                        ..._lowStockItems!.take(10).map(_buildLowStockItemCard),
-                      ],
-
-                      // Empty state
-                      if (_summary?['itemCount'] == 0) ...[
-                        const SizedBox(height: 48),
-                        Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No items in inventory',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: Colors.grey.shade600,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Add items to see stock valuation',
-                                style: TextStyle(color: Colors.grey.shade600),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+
+                  // Summary section
+                  if (_summary != null) ...[
+                    _buildSectionHeader('Valuation Summary'),
+                    const SizedBox(height: 12),
+                    _buildSummaryCard(),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Company breakdown
+                  if (_companyBreakdown != null &&
+                      _companyBreakdown!.isNotEmpty) ...[
+                    _buildSectionHeader('Breakdown by Company'),
+                    const SizedBox(height: 12),
+                    ..._companyBreakdown!.map(_buildCompanyCard),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Low stock items
+                  if (_lowStockItems != null && _lowStockItems!.isNotEmpty) ...[
+                    _buildSectionHeader('Low Stock Items'),
+                    const SizedBox(height: 12),
+                    _buildLowStockSummary(),
+                    const SizedBox(height: 12),
+                    ..._lowStockItems!.take(10).map(_buildLowStockItemCard),
+                  ],
+
+                  // Empty state
+                  if (_summary?['itemCount'] == 0) ...[
+                    const SizedBox(height: 48),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No items in inventory',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Add items to see stock valuation',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
     );
   }
 
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
     );
   }
 
@@ -232,9 +221,9 @@ class _StockValuationReportScreenState
               Text(
                 'Items at or below reorder level',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  color: Colors.grey.shade600,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ],
           ],
@@ -268,22 +257,22 @@ class _StockValuationReportScreenState
             children: [
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
                 style: isLarge
                     ? Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isHighlight ? color : null,
-                        )
+                        fontWeight: FontWeight.bold,
+                        color: isHighlight ? color : null,
+                      )
                     : Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isHighlight ? color : null,
-                        ),
+                        fontWeight: FontWeight.bold,
+                        color: isHighlight ? color : null,
+                      ),
               ),
             ],
           ),
@@ -318,8 +307,8 @@ class _StockValuationReportScreenState
                   child: Text(
                     company,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Container(
@@ -353,17 +342,9 @@ class _StockValuationReportScreenState
                     isBold: true,
                   ),
                 ),
+                Expanded(child: _buildDetailColumn('Items', '$itemCount')),
                 Expanded(
-                  child: _buildDetailColumn(
-                    'Items',
-                    '$itemCount',
-                  ),
-                ),
-                Expanded(
-                  child: _buildDetailColumn(
-                    'Stock',
-                    '$totalStock units',
-                  ),
+                  child: _buildDetailColumn('Stock', '$totalStock units'),
                 ),
               ],
             ),
@@ -403,9 +384,9 @@ class _StockValuationReportScreenState
                   Text(
                     'At Risk Inventory',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade900,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade900,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -416,8 +397,8 @@ class _StockValuationReportScreenState
                   Text(
                     'Items at or below reorder level need restocking',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.orange.shade700,
-                        ),
+                      color: Colors.orange.shade700,
+                    ),
                   ),
                 ],
               ),
@@ -456,17 +437,11 @@ class _StockValuationReportScreenState
           children: [
             Text(
               CurrencyHelper.format(itemValue),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             Text(
               '${item.stock} units',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -485,17 +460,17 @@ class _StockValuationReportScreenState
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
         ),
         const SizedBox(height: 4),
         Text(
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-                color: color,
-              ),
+            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+            color: color,
+          ),
         ),
       ],
     );

@@ -125,92 +125,79 @@ class _TopSellingItemsReportScreenState
       body: _isLoading
           ? const LoadingWidget(message: 'Loading sales data...')
           : _error != null
-              ? ErrorStateWidget(
-                  error: _error!,
-                  onRetry: _loadTopSellingItems,
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadTopSellingItems,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // Info card
-                      Card(
-                        color: Colors.amber.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Icon(Icons.star, color: Colors.amber.shade700),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Best-performing products ranked by quantity sold. Use this to optimize inventory and identify popular items.',
-                                  style:
-                                      TextStyle(color: Colors.amber.shade700),
-                                ),
-                              ),
-                            ],
+          ? ErrorStateWidget(error: _error!, onRetry: _loadTopSellingItems)
+          : RefreshIndicator(
+              onRefresh: _loadTopSellingItems,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Info card
+                  Card(
+                    color: Colors.amber.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(Icons.star, color: Colors.amber.shade700),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Best-performing products ranked by quantity sold. Use this to optimize inventory and identify popular items.',
+                              style: TextStyle(color: Colors.amber.shade700),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-
-                      // Date range selection
-                      _buildDateRangeCard(dateFormat),
-                      const SizedBox(height: 16),
-
-                      // Quick filters
-                      _buildQuickFilters(),
-                      const SizedBox(height: 24),
-
-                      // Top items list
-                      if (_topItems != null && _topItems!.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          'Top ${_topItems!.length} Items',
-                        ),
-                        const SizedBox(height: 12),
-                        ..._topItems!.asMap().entries.map((entry) {
-                          return _buildTopItemCard(
-                            entry.key + 1,
-                            entry.value,
-                          );
-                        }),
-                      ],
-
-                      // Empty state
-                      if (_topItems != null && _topItems!.isEmpty) ...[
-                        const SizedBox(height: 48),
-                        Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No sales data',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: Colors.grey.shade600,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'No items sold in selected period',
-                                style: TextStyle(color: Colors.grey.shade600),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+
+                  // Date range selection
+                  _buildDateRangeCard(dateFormat),
+                  const SizedBox(height: 16),
+
+                  // Quick filters
+                  _buildQuickFilters(),
+                  const SizedBox(height: 24),
+
+                  // Top items list
+                  if (_topItems != null && _topItems!.isNotEmpty) ...[
+                    _buildSectionHeader('Top ${_topItems!.length} Items'),
+                    const SizedBox(height: 12),
+                    ..._topItems!.asMap().entries.map((entry) {
+                      return _buildTopItemCard(entry.key + 1, entry.value);
+                    }),
+                  ],
+
+                  // Empty state
+                  if (_topItems != null && _topItems!.isEmpty) ...[
+                    const SizedBox(height: 48),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No sales data',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No items sold in selected period',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
     );
   }
 
@@ -229,10 +216,7 @@ class _TopSellingItemsReportScreenState
                   color: Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.date_range,
-                  color: Colors.blue.shade700,
-                ),
+                child: Icon(Icons.date_range, color: Colors.blue.shade700),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -241,17 +225,16 @@ class _TopSellingItemsReportScreenState
                   children: [
                     Text(
                       'Date Range',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: Colors.grey.shade600),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${dateFormat.format(_startDate)} - ${dateFormat.format(_endDate)}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -293,9 +276,9 @@ class _TopSellingItemsReportScreenState
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
     );
   }
 
@@ -361,16 +344,15 @@ class _TopSellingItemsReportScreenState
                     children: [
                       Text(
                         name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${company ?? 'No Brand'} • SKU: $sku',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey.shade600,
-                            ),
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ],
                   ),
@@ -442,15 +424,15 @@ class _TopSellingItemsReportScreenState
             children: [
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
               ),
               Text(
                 value,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),

@@ -101,155 +101,135 @@ class _SalesByPeriodReportScreenState
       body: _isLoading
           ? const LoadingWidget(message: 'Loading sales data...')
           : _error != null
-              ? ErrorStateWidget(
-                  error: _error!,
-                  onRetry: _loadSalesData,
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadSalesData,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // Info card
-                      Card(
-                        color: Colors.teal.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Icon(Icons.date_range, color: Colors.teal.shade700),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Analyze sales trends across different time periods.',
-                                  style: TextStyle(color: Colors.teal.shade700),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Date range selection
-                      Card(
-                        child: InkWell(
-                          onTap: _selectDateRange,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    Icons.calendar_today,
-                                    color: Colors.blue.shade700,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Date Range',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Colors.grey.shade600,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${dateFormat.format(_startDate)} - ${dateFormat.format(_endDate)}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Icon(Icons.arrow_forward_ios, size: 16),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Period selection
-                      Row(
+          ? ErrorStateWidget(error: _error!, onRetry: _loadSalesData)
+          : RefreshIndicator(
+              onRefresh: _loadSalesData,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Info card
+                  Card(
+                    color: Colors.teal.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
                         children: [
+                          Icon(Icons.date_range, color: Colors.teal.shade700),
+                          const SizedBox(width: 12),
                           Expanded(
-                            child: _buildPeriodButton('Daily', 'day'),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildPeriodButton('Weekly', 'week'),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildPeriodButton('Monthly', 'month'),
+                            child: Text(
+                              'Analyze sales trends across different time periods.',
+                              style: TextStyle(color: Colors.teal.shade700),
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-                      // Period data list
-                      if (_periodData != null && _periodData!.isNotEmpty) ...[
-                        Text(
-                          'Sales Breakdown',
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
+                  // Date range selection
+                  Card(
+                    child: InkWell(
+                      onTap: _selectDateRange,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.calendar_today,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Date Range',
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(color: Colors.grey.shade600),
                                   ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${dateFormat.format(_startDate)} - ${dateFormat.format(_endDate)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        ..._periodData!.map(_buildPeriodCard),
-                      ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-                      // Empty state
-                      if (_periodData != null && _periodData!.isEmpty) ...[
-                        const SizedBox(height: 48),
-                        Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.receipt_long_outlined,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No sales data',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: Colors.grey.shade600,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'No sales in selected period',
-                                style: TextStyle(color: Colors.grey.shade600),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                  // Period selection
+                  Row(
+                    children: [
+                      Expanded(child: _buildPeriodButton('Daily', 'day')),
+                      const SizedBox(width: 8),
+                      Expanded(child: _buildPeriodButton('Weekly', 'week')),
+                      const SizedBox(width: 8),
+                      Expanded(child: _buildPeriodButton('Monthly', 'month')),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 24),
+
+                  // Period data list
+                  if (_periodData != null && _periodData!.isNotEmpty) ...[
+                    Text(
+                      'Sales Breakdown',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ..._periodData!.map(_buildPeriodCard),
+                  ],
+
+                  // Empty state
+                  if (_periodData != null && _periodData!.isEmpty) ...[
+                    const SizedBox(height: 48),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.receipt_long_outlined,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No sales data',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No sales in selected period',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
     );
   }
 
@@ -258,8 +238,9 @@ class _SalesByPeriodReportScreenState
     return ElevatedButton(
       onPressed: () => _setPeriod(period),
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isSelected ? Theme.of(context).primaryColor : Colors.grey.shade200,
+        backgroundColor: isSelected
+            ? Theme.of(context).primaryColor
+            : Colors.grey.shade200,
         foregroundColor: isSelected ? Colors.white : Colors.grey.shade700,
         elevation: isSelected ? 2 : 0,
       ),
@@ -305,8 +286,8 @@ class _SalesByPeriodReportScreenState
                   child: Text(
                     periodLabel,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Container(
@@ -367,17 +348,17 @@ class _SalesByPeriodReportScreenState
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
         ),
         const SizedBox(height: 4),
         Text(
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
       ],
     );

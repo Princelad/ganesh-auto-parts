@@ -93,142 +93,128 @@ class _CustomerInsightsReportScreenState
       body: _isLoading
           ? const LoadingWidget(message: 'Loading customer data...')
           : _error != null
-              ? ErrorStateWidget(
-                  error: _error!,
-                  onRetry: _loadCustomerData,
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadCustomerData,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // Info card
-                      Card(
-                        color: Colors.green.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Icon(Icons.account_circle, color: Colors.green.shade700),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Top customers and buying patterns. Identify valuable customers.',
-                                  style: TextStyle(color: Colors.green.shade700),
-                                ),
-                              ),
-                            ],
+          ? ErrorStateWidget(error: _error!, onRetry: _loadCustomerData)
+          : RefreshIndicator(
+              onRefresh: _loadCustomerData,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Info card
+                  Card(
+                    color: Colors.green.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.account_circle,
+                            color: Colors.green.shade700,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Date range selection
-                      Card(
-                        child: InkWell(
-                          onTap: _selectDateRange,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    Icons.date_range,
-                                    color: Colors.blue.shade700,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Date Range',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Colors.grey.shade600,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '${dateFormat.format(_startDate)} - ${dateFormat.format(_endDate)}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Icon(Icons.arrow_forward_ios, size: 16),
-                              ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Top customers and buying patterns. Identify valuable customers.',
+                              style: TextStyle(color: Colors.green.shade700),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Date range selection
+                  Card(
+                    child: InkWell(
+                      onTap: _selectDateRange,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.date_range,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Date Range',
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(color: Colors.grey.shade600),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${dateFormat.format(_startDate)} - ${dateFormat.format(_endDate)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Customer data list
-                      if (_customerData != null && _customerData!.isNotEmpty) ...[
-                        Text(
-                          'Top ${_customerData!.length} Customers',
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                        const SizedBox(height: 12),
-                        ..._customerData!.asMap().entries.map((entry) {
-                          return _buildCustomerCard(
-                            entry.key + 1,
-                            entry.value,
-                          );
-                        }),
-                      ],
-
-                      // Empty state
-                      if (_customerData != null && _customerData!.isEmpty) ...[
-                        const SizedBox(height: 48),
-                        Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.people_outline,
-                                size: 64,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No customer data',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      color: Colors.grey.shade600,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'No customer purchases in selected period',
-                                style: TextStyle(color: Colors.grey.shade600),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+
+                  // Customer data list
+                  if (_customerData != null && _customerData!.isNotEmpty) ...[
+                    Text(
+                      'Top ${_customerData!.length} Customers',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ..._customerData!.asMap().entries.map((entry) {
+                      return _buildCustomerCard(entry.key + 1, entry.value);
+                    }),
+                  ],
+
+                  // Empty state
+                  if (_customerData != null && _customerData!.isEmpty) ...[
+                    const SizedBox(height: 48),
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.people_outline,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No customer data',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No customer purchases in selected period',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
     );
   }
 
@@ -294,20 +280,22 @@ class _CustomerInsightsReportScreenState
                     children: [
                       Text(
                         name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.phone, size: 14, color: Colors.grey.shade600),
+                          Icon(
+                            Icons.phone,
+                            size: 14,
+                            color: Colors.grey.shade600,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             phone,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey.shade600,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey.shade600),
                           ),
                         ],
                       ),
@@ -438,15 +426,15 @@ class _CustomerInsightsReportScreenState
             children: [
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
               ),
               Text(
                 value,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
