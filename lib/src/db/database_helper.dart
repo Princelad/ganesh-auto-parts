@@ -25,7 +25,7 @@ class ERPDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -67,6 +67,9 @@ class ERPDatabase {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         invoiceNo TEXT NOT NULL UNIQUE,
         customerId INTEGER,
+        subtotal REAL NOT NULL DEFAULT 0.0,
+        taxRate REAL NOT NULL DEFAULT 0.0,
+        taxAmount REAL NOT NULL DEFAULT 0.0,
         total REAL NOT NULL,
         paid REAL NOT NULL DEFAULT 0.0,
         date INTEGER NOT NULL,
@@ -102,6 +105,29 @@ class ERPDatabase {
         synced INTEGER NOT NULL DEFAULT 0
       )
     ''');
+
+    // Settings table
+    await db.execute('''
+      CREATE TABLE settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        gstEnabled INTEGER NOT NULL DEFAULT 0,
+        defaultGstRate REAL NOT NULL DEFAULT 18.0,
+        gstin TEXT,
+        businessName TEXT NOT NULL DEFAULT 'Ganesh Auto Parts',
+        businessAddress TEXT,
+        businessPhone TEXT,
+        businessEmail TEXT,
+        updatedAt INTEGER NOT NULL
+      )
+    ''');
+
+    // Insert default settings
+    await db.insert('settings', {
+      'gstEnabled': 0,
+      'defaultGstRate': 18.0,
+      'businessName': 'Ganesh Auto Parts',
+      'updatedAt': DateTime.now().millisecondsSinceEpoch,
+    });
 
     // Create indexes for performance
     await _createIndexes(db);
@@ -150,8 +176,45 @@ class ERPDatabase {
   }
 
   /// Handle database upgrades
-  /// Migration placeholder - add version-specific migrations here
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Add GST fields to invoices table
+      await db.execute(
+        'ALTER TABLE invoices ADD COLUMN subtotal REAL NOT NULL DEFAULT 0.0',
+      );
+      await db.execute(
+        'ALTER TABLE invoices ADD COLUMN taxRate REAL NOT NULL DEFAULT 0.0',
+      );
+      await db.execute(
+        'ALTER TABLE invoices ADD COLUMN taxAmount REAL NOT NULL DEFAULT 0.0',
+      );
+
+      // Migrate existing data: set subtotal = total for old invoices
+      await db.execute('UPDATE invoices SET subtotal = total');
+
+      // Create settings table
+      await db.execute('''
+        CREATE TABLE settings (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          gstEnabled INTEGER NOT NULL DEFAULT 0,
+          defaultGstRate REAL NOT NULL DEFAULT 18.0,
+          gstin TEXT,
+          businessName TEXT NOT NULL DEFAULT 'Ganesh Auto Parts',
+          businessAddress TEXT,
+          businessPhone TEXT,
+          businessEmail TEXT,
+          updatedAt INTEGER NOT NULL
+        )
+      ''');
+
+      // Insert default settings
+      await db.insert('settings', {
+        'gstEnabled': 0,
+        'defaultGstRate': 18.0,
+        'businessName': 'Ganesh Auto Parts',
+        'updatedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+    }
     // Example migration pattern:
     // if (oldVersion < 2) {
     //   await db.execute('ALTER TABLE items ADD COLUMN barcode TEXT');

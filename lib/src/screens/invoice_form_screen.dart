@@ -8,6 +8,7 @@ import '../models/customer.dart';
 import '../providers/invoice_provider.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/dialogs.dart';
 
 class InvoiceFormScreen extends ConsumerStatefulWidget {
@@ -26,11 +27,15 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   DateTime _selectedDate = DateTime.now();
   final List<_LineItem> _lineItems = [];
   bool _isSaving = false;
+  double _taxRate = 0.0; // GST rate percentage
+  bool _gstEnabled = false;
+  bool _settingsLoaded = false; // Track if we've loaded settings from DB
 
   @override
   void initState() {
     super.initState();
     _generateInvoiceNumber();
+    // Load GST settings will be done in build method via ref.watch
   }
 
   void _generateInvoiceNumber() {
@@ -46,8 +51,16 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
     super.dispose();
   }
 
-  double get _totalAmount {
+  double get _subtotal {
     return _lineItems.fold(0.0, (sum, item) => sum + item.lineTotal);
+  }
+
+  double get _taxAmount {
+    return _gstEnabled ? (_subtotal * _taxRate / 100) : 0.0;
+  }
+
+  double get _totalAmount {
+    return _subtotal + _taxAmount;
   }
 
   double get _paidAmount {
@@ -58,10 +71,29 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
     return _totalAmount - _paidAmount;
   }
 
+  // Available GST rates in India
+  final List<double> _availableGstRates = [0, 5, 12, 18, 28];
+
   @override
   Widget build(BuildContext context) {
     final itemsAsync = ref.watch(itemProvider);
     final customersAsync = ref.watch(customerProvider);
+    final settingsAsync = ref.watch(settingsProvider);
+
+    // Load GST settings from database only once when screen opens
+    settingsAsync.whenData((settings) {
+      if (settings != null && !_settingsLoaded) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_settingsLoaded) {
+            setState(() {
+              _gstEnabled = settings.gstEnabled;
+              _taxRate = settings.defaultGstRate;
+              _settingsLoaded = true;
+            });
+          }
+        });
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -222,7 +254,58 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
-                          _buildSummaryRow('Total Amount', _totalAmount),
+
+                          // Subtotal
+                          _buildSummaryRow('Subtotal', _subtotal),
+
+                          // GST Section
+                          if (_gstEnabled) ...[
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DropdownButtonFormField<double>(
+                                    initialValue: _taxRate,
+                                    decoration: const InputDecoration(
+                                      labelText: 'GST Rate',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.percent),
+                                    ),
+                                    items: _availableGstRates.map((rate) {
+                                      return DropdownMenuItem(
+                                        value: rate,
+                                        child: Text(
+                                          '${rate.toStringAsFixed(0)}%',
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          _taxRate = value;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            _buildSummaryRow(
+                              'GST Amount (${_taxRate.toStringAsFixed(0)}%)',
+                              _taxAmount,
+                            ),
+                          ],
+
+                          const Divider(height: 24),
+
+                          // Total
+                          _buildSummaryRow(
+                            'Total Amount',
+                            _totalAmount,
+                            isBold: true,
+                          ),
+
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _paidAmountController,
@@ -352,18 +435,26 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
     );
   }
 
-  Widget _buildSummaryRow(String label, double amount, {Color? color}) {
+  Widget _buildSummaryRow(
+    String label,
+    double amount, {
+    Color? color,
+    bool isBold = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: isBold ? 18 : 16,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+          ),
         ),
         Text(
           '₹${amount.toStringAsFixed(2)}',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: isBold ? 20 : 18,
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -587,6 +678,9 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
       final invoice = Invoice(
         invoiceNo: _invoiceNoController.text.trim(),
         customerId: _selectedCustomer?.id,
+        subtotal: _subtotal,
+        taxRate: _taxRate,
+        taxAmount: _taxAmount,
         total: _totalAmount,
         paid: _paidAmount,
         date: _selectedDate.millisecondsSinceEpoch,

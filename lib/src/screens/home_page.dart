@@ -7,6 +7,7 @@ import 'stock_adjustment_screen.dart';
 import 'reports_screen.dart';
 import 'csv_export_import_screen.dart';
 import 'invoices_list_screen.dart';
+import 'settings_screen.dart';
 import '../widgets/dashboard_stats_widget.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
@@ -155,6 +156,18 @@ class HomePage extends ConsumerWidget {
                   title: 'Security',
                   color: Colors.deepPurple,
                   onTap: () => Navigator.pushNamed(context, '/security'),
+                ),
+                _buildMenuCard(
+                  context,
+                  icon: Icons.settings,
+                  title: 'Settings',
+                  color: Colors.orange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  ),
                 ),
                 _buildMenuCard(
                   context,

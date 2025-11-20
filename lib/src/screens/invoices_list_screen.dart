@@ -719,12 +719,17 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
         }
       }
 
+      // Get settings for business info and GST
+      final settingsRepository = ref.read(settingsRepositoryProvider);
+      final settings = await settingsRepository.getSettings();
+
       // Generate PDF
       final pdfBytes = await PdfService.generateInvoice(
         invoice: invoice,
         items: invoiceItems,
         allItems: allItems,
         customer: customer,
+        settings: settings,
       );
 
       // Close loading dialog

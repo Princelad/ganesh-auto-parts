@@ -5,7 +5,10 @@ class Invoice {
   final int? id;
   final String invoiceNo;
   final int? customerId;
-  final double total;
+  final double subtotal; // Amount before tax
+  final double taxRate; // GST rate (e.g., 18.0 for 18%)
+  final double taxAmount; // Calculated tax amount
+  final double total; // Subtotal + taxAmount
   final double paid;
   final int date;
   final int createdAt;
@@ -15,6 +18,9 @@ class Invoice {
     this.id,
     required this.invoiceNo,
     this.customerId,
+    required this.subtotal,
+    this.taxRate = 0.0,
+    this.taxAmount = 0.0,
     required this.total,
     required this.paid,
     required this.date,
@@ -28,6 +34,9 @@ class Invoice {
       'id': id,
       'invoiceNo': invoiceNo,
       'customerId': customerId,
+      'subtotal': subtotal,
+      'taxRate': taxRate,
+      'taxAmount': taxAmount,
       'total': total,
       'paid': paid,
       'date': date,
@@ -42,6 +51,11 @@ class Invoice {
       id: map['id'] as int?,
       invoiceNo: map['invoiceNo'] as String,
       customerId: map['customerId'] as int?,
+      subtotal:
+          (map['subtotal'] as num?)?.toDouble() ??
+          (map['total'] as num).toDouble(),
+      taxRate: (map['taxRate'] as num?)?.toDouble() ?? 0.0,
+      taxAmount: (map['taxAmount'] as num?)?.toDouble() ?? 0.0,
       total: (map['total'] as num).toDouble(),
       paid: (map['paid'] as num).toDouble(),
       date: map['date'] as int,
@@ -62,6 +76,9 @@ class Invoice {
     int? id,
     String? invoiceNo,
     int? customerId,
+    double? subtotal,
+    double? taxRate,
+    double? taxAmount,
     double? total,
     double? paid,
     int? date,
@@ -72,6 +89,9 @@ class Invoice {
       id: id ?? this.id,
       invoiceNo: invoiceNo ?? this.invoiceNo,
       customerId: customerId ?? this.customerId,
+      subtotal: subtotal ?? this.subtotal,
+      taxRate: taxRate ?? this.taxRate,
+      taxAmount: taxAmount ?? this.taxAmount,
       total: total ?? this.total,
       paid: paid ?? this.paid,
       date: date ?? this.date,

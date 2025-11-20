@@ -71,6 +71,7 @@ void main() {
         id: 1,
         invoiceNo: 'INV-0001',
         customerId: 1,
+        subtotal: 1000.0,
         total: 1000.0,
         paid: 600.0,
         date: now,

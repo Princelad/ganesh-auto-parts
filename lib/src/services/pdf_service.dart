@@ -6,6 +6,7 @@ import '../models/invoice.dart';
 import '../models/invoice_item.dart';
 import '../models/customer.dart';
 import '../models/item.dart';
+import '../models/app_settings.dart';
 
 /// Service for generating PDF invoices
 class PdfService {
@@ -15,6 +16,7 @@ class PdfService {
     required List<InvoiceItem> items,
     required List<Item> allItems,
     Customer? customer,
+    AppSettings? settings,
   }) async {
     final pdf = pw.Document();
     final dateFormat = DateFormat('dd/MM/yyyy');
@@ -56,18 +58,18 @@ class PdfService {
         build: (pw.Context context) {
           return [
             // Header
-            _buildHeader(),
+            _buildHeader(settings),
             pw.SizedBox(height: 20),
 
             // Invoice Details
-            _buildInvoiceDetails(invoice, customer, dateFormat),
+            _buildInvoiceDetails(invoice, customer, dateFormat, settings),
             pw.SizedBox(height: 20),
 
             // Items Table
-            _buildItemsTable(itemDetails, currencyFormat),
+            _buildItemsTable(itemDetails, currencyFormat, invoice.taxRate),
             pw.SizedBox(height: 20),
 
-            // Totals
+            // Totals with GST
             _buildTotals(invoice, currencyFormat),
             pw.SizedBox(height: 30),
 
@@ -86,7 +88,9 @@ class PdfService {
   }
 
   /// Build PDF header with company name
-  static pw.Widget _buildHeader() {
+  static pw.Widget _buildHeader(AppSettings? settings) {
+    final businessName = settings?.businessName ?? 'GANESH AUTO PARTS';
+
     return pw.Container(
       padding: const pw.EdgeInsets.all(10),
       decoration: pw.BoxDecoration(
@@ -97,7 +101,7 @@ class PdfService {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(
-            'GANESH AUTO PARTS',
+            businessName.toUpperCase(),
             style: pw.TextStyle(
               fontSize: 24,
               fontWeight: pw.FontWeight.bold,
@@ -105,10 +109,46 @@ class PdfService {
             ),
           ),
           pw.SizedBox(height: 5),
-          pw.Text(
-            'Auto Parts & Accessories',
-            style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
+          if (settings?.businessAddress != null) ...[
+            pw.Text(
+              settings!.businessAddress!,
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
+            pw.SizedBox(height: 2),
+          ],
+          pw.Row(
+            children: [
+              if (settings?.businessPhone != null) ...[
+                pw.Text(
+                  'Phone: ${settings!.businessPhone}',
+                  style: const pw.TextStyle(
+                    fontSize: 10,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+                pw.SizedBox(width: 15),
+              ],
+              if (settings?.businessEmail != null)
+                pw.Text(
+                  'Email: ${settings!.businessEmail}',
+                  style: const pw.TextStyle(
+                    fontSize: 10,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+            ],
           ),
+          if (settings?.gstEnabled == true && settings?.gstin != null) ...[
+            pw.SizedBox(height: 2),
+            pw.Text(
+              'GSTIN: ${settings!.gstin}',
+              style: pw.TextStyle(
+                fontSize: 10,
+                color: PdfColors.grey700,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -119,6 +159,7 @@ class PdfService {
     Invoice invoice,
     Customer? customer,
     DateFormat dateFormat,
+    AppSettings? settings,
   ) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -204,56 +245,171 @@ class PdfService {
   static pw.Widget _buildItemsTable(
     List<Map<String, dynamic>> items,
     NumberFormat currencyFormat,
+    double taxRate,
   ) {
+    final hasGst = taxRate > 0;
+
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey300),
-      columnWidths: {
-        0: const pw.FlexColumnWidth(1), // Sr. No
-        1: const pw.FlexColumnWidth(3), // Item Name
-        2: const pw.FlexColumnWidth(2), // Company
-        3: const pw.FlexColumnWidth(2), // SKU
-        4: const pw.FlexColumnWidth(1.5), // Qty
-        5: const pw.FlexColumnWidth(2), // Rate
-        6: const pw.FlexColumnWidth(2), // Amount
-      },
+      columnWidths: hasGst
+          ? {
+              0: const pw.FlexColumnWidth(0.8), // Sr. No
+              1: const pw.FlexColumnWidth(3), // Item Name
+              2: const pw.FlexColumnWidth(1.5), // Company
+              3: const pw.FlexColumnWidth(1.5), // SKU
+              4: const pw.FlexColumnWidth(1), // Qty
+              5: const pw.FlexColumnWidth(1.5), // Rate
+              6: const pw.FlexColumnWidth(1.5), // Subtotal
+              7: const pw.FlexColumnWidth(1.2), // GST%
+              8: const pw.FlexColumnWidth(1.5), // GST Amt
+              9: const pw.FlexColumnWidth(1.8), // Total
+            }
+          : {
+              0: const pw.FlexColumnWidth(1), // Sr. No
+              1: const pw.FlexColumnWidth(3), // Item Name
+              2: const pw.FlexColumnWidth(2), // Company
+              3: const pw.FlexColumnWidth(2), // SKU
+              4: const pw.FlexColumnWidth(1.5), // Qty
+              5: const pw.FlexColumnWidth(2), // Rate
+              6: const pw.FlexColumnWidth(2), // Amount
+            },
       children: [
         // Header
         pw.TableRow(
           decoration: const pw.BoxDecoration(color: PdfColors.blue100),
-          children: [
-            _buildTableCell('Sr.', isHeader: true),
-            _buildTableCell('Item Name', isHeader: true),
-            _buildTableCell('Company', isHeader: true),
-            _buildTableCell('SKU', isHeader: true),
-            _buildTableCell('Qty', isHeader: true, align: pw.TextAlign.center),
-            _buildTableCell('Rate', isHeader: true, align: pw.TextAlign.right),
-            _buildTableCell(
-              'Amount',
-              isHeader: true,
-              align: pw.TextAlign.right,
-            ),
-          ],
+          children: hasGst
+              ? [
+                  _buildTableCell('Sr.', isHeader: true, fontSize: 8),
+                  _buildTableCell('Item Name', isHeader: true, fontSize: 8),
+                  _buildTableCell('Company', isHeader: true, fontSize: 8),
+                  _buildTableCell('SKU', isHeader: true, fontSize: 8),
+                  _buildTableCell(
+                    'Qty',
+                    isHeader: true,
+                    align: pw.TextAlign.center,
+                    fontSize: 8,
+                  ),
+                  _buildTableCell(
+                    'Rate',
+                    isHeader: true,
+                    align: pw.TextAlign.right,
+                    fontSize: 8,
+                  ),
+                  _buildTableCell(
+                    'Subtotal',
+                    isHeader: true,
+                    align: pw.TextAlign.right,
+                    fontSize: 8,
+                  ),
+                  _buildTableCell(
+                    'GST%',
+                    isHeader: true,
+                    align: pw.TextAlign.center,
+                    fontSize: 8,
+                  ),
+                  _buildTableCell(
+                    'GST Amt',
+                    isHeader: true,
+                    align: pw.TextAlign.right,
+                    fontSize: 8,
+                  ),
+                  _buildTableCell(
+                    'Total',
+                    isHeader: true,
+                    align: pw.TextAlign.right,
+                    fontSize: 8,
+                  ),
+                ]
+              : [
+                  _buildTableCell('Sr.', isHeader: true),
+                  _buildTableCell('Item Name', isHeader: true),
+                  _buildTableCell('Company', isHeader: true),
+                  _buildTableCell('SKU', isHeader: true),
+                  _buildTableCell(
+                    'Qty',
+                    isHeader: true,
+                    align: pw.TextAlign.center,
+                  ),
+                  _buildTableCell(
+                    'Rate',
+                    isHeader: true,
+                    align: pw.TextAlign.right,
+                  ),
+                  _buildTableCell(
+                    'Amount',
+                    isHeader: true,
+                    align: pw.TextAlign.right,
+                  ),
+                ],
         ),
         // Items
         ...items.asMap().entries.map((entry) {
           final index = entry.key;
           final item = entry.value;
+          final itemSubtotal = item['lineTotal'] as double;
+          final itemGstAmount = hasGst ? (itemSubtotal * taxRate / 100) : 0.0;
+          final itemTotal = itemSubtotal + itemGstAmount;
+
           return pw.TableRow(
-            children: [
-              _buildTableCell('${index + 1}', align: pw.TextAlign.center),
-              _buildTableCell(item['name'] as String),
-              _buildTableCell(item['company'] as String),
-              _buildTableCell(item['sku'] as String),
-              _buildTableCell('${item['qty']}', align: pw.TextAlign.center),
-              _buildTableCell(
-                currencyFormat.format(item['unitPrice']),
-                align: pw.TextAlign.right,
-              ),
-              _buildTableCell(
-                currencyFormat.format(item['lineTotal']),
-                align: pw.TextAlign.right,
-              ),
-            ],
+            children: hasGst
+                ? [
+                    _buildTableCell(
+                      '${index + 1}',
+                      align: pw.TextAlign.center,
+                      fontSize: 8,
+                    ),
+                    _buildTableCell(item['name'] as String, fontSize: 8),
+                    _buildTableCell(item['company'] as String, fontSize: 8),
+                    _buildTableCell(item['sku'] as String, fontSize: 8),
+                    _buildTableCell(
+                      '${item['qty']}',
+                      align: pw.TextAlign.center,
+                      fontSize: 8,
+                    ),
+                    _buildTableCell(
+                      currencyFormat.format(item['unitPrice']),
+                      align: pw.TextAlign.right,
+                      fontSize: 8,
+                    ),
+                    _buildTableCell(
+                      currencyFormat.format(itemSubtotal),
+                      align: pw.TextAlign.right,
+                      fontSize: 8,
+                    ),
+                    _buildTableCell(
+                      '${taxRate.toStringAsFixed(0)}%',
+                      align: pw.TextAlign.center,
+                      fontSize: 8,
+                    ),
+                    _buildTableCell(
+                      currencyFormat.format(itemGstAmount),
+                      align: pw.TextAlign.right,
+                      fontSize: 8,
+                    ),
+                    _buildTableCell(
+                      currencyFormat.format(itemTotal),
+                      align: pw.TextAlign.right,
+                      fontSize: 8,
+                    ),
+                  ]
+                : [
+                    _buildTableCell('${index + 1}', align: pw.TextAlign.center),
+                    _buildTableCell(item['name'] as String),
+                    _buildTableCell(item['company'] as String),
+                    _buildTableCell(item['sku'] as String),
+                    _buildTableCell(
+                      '${item['qty']}',
+                      align: pw.TextAlign.center,
+                    ),
+                    _buildTableCell(
+                      currencyFormat.format(item['unitPrice']),
+                      align: pw.TextAlign.right,
+                    ),
+                    _buildTableCell(
+                      currencyFormat.format(item['lineTotal']),
+                      align: pw.TextAlign.right,
+                    ),
+                  ],
           );
         }),
       ],
@@ -265,13 +421,14 @@ class PdfService {
     String text, {
     bool isHeader = false,
     pw.TextAlign align = pw.TextAlign.left,
+    double? fontSize,
   }) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(5),
       child: pw.Text(
         text,
         style: pw.TextStyle(
-          fontSize: isHeader ? 10 : 9,
+          fontSize: fontSize ?? (isHeader ? 10 : 9),
           fontWeight: isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
         ),
         textAlign: align,
@@ -281,6 +438,8 @@ class PdfService {
 
   /// Build totals section
   static pw.Widget _buildTotals(Invoice invoice, NumberFormat currencyFormat) {
+    final hasGst = invoice.taxRate > 0;
+
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.end,
       children: [
@@ -293,7 +452,20 @@ class PdfService {
           ),
           child: pw.Column(
             children: [
-              _buildTotalRow('Subtotal:', currencyFormat.format(invoice.total)),
+              _buildTotalRow(
+                'Subtotal:',
+                currencyFormat.format(invoice.subtotal),
+              ),
+
+              // Show GST breakdown if applicable
+              if (hasGst) ...[
+                pw.SizedBox(height: 5),
+                _buildTotalRow(
+                  'GST (${invoice.taxRate.toStringAsFixed(0)}%):',
+                  currencyFormat.format(invoice.taxAmount),
+                ),
+              ],
+
               pw.Divider(height: 10, thickness: 1),
               _buildTotalRow(
                 'Total Amount:',
