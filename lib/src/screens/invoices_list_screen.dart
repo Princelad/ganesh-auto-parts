@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import '../models/invoice.dart';
+import '../models/customer.dart';
+import '../models/item.dart';
 import '../providers/invoice_provider.dart';
 import '../providers/customer_provider.dart';
+import '../providers/item_provider.dart';
 import '../widgets/dialogs.dart';
 import 'invoice_form_screen.dart';
+import '../services/pdf_service.dart';
 
 class InvoicesListScreen extends ConsumerStatefulWidget {
   const InvoicesListScreen({super.key});
@@ -482,6 +487,18 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
             ),
           const SizedBox(height: 24),
           // Actions
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => _exportToPdf(invoice, customerName),
+              icon: const Icon(Icons.picture_as_pdf),
+              label: const Text('Export as PDF'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           if (!isFullyPaid) ...[
             SizedBox(
               width: double.infinity,
@@ -656,5 +673,88 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _exportToPdf(Invoice invoice, String customerName) async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Generating PDF...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Get invoice items
+      final invoiceItems =
+          await ref.read(invoiceItemsProvider(invoice.id!).future);
+
+      // Get all items
+      final allItemsAsync = ref.read(itemProvider);
+      final allItems = allItemsAsync.when(
+        data: (items) => items,
+        loading: () => <Item>[],
+        error: (_, __) => <Item>[],
+      );
+
+      // Get customer if exists
+      Customer? customer;
+      if (invoice.customerId != null) {
+        final customersAsync = ref.read(customerProvider);
+        final customers = customersAsync.when(
+          data: (customers) => customers,
+          loading: () => <Customer>[],
+          error: (_, __) => <Customer>[],
+        );
+
+        try {
+          customer = customers.firstWhere(
+            (c) => c.id == invoice.customerId,
+          );
+        } catch (e) {
+          customer = null;
+        }
+      }
+
+      // Generate PDF
+      final pdfBytes = await PdfService.generateInvoice(
+        invoice: invoice,
+        items: invoiceItems,
+        allItems: allItems,
+        customer: customer,
+      );
+
+      // Close loading dialog
+      if (mounted) {
+        Navigator.pop(context);
+      }
+
+      // Show PDF preview with share/print options
+      if (mounted) {
+        await Printing.sharePdf(
+          bytes: pdfBytes,
+          filename: 'Invoice-${invoice.invoiceNo}.pdf',
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) {
+        Navigator.pop(context);
+        showErrorSnackBar(context, 'Failed to generate PDF: $e');
+      }
+    }
   }
 }
