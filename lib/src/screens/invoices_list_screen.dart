@@ -248,7 +248,7 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
         }
       },
       loading: () => '...',
-      error: (_, __) => 'Unknown',
+      error: (_, _) => 'Unknown',
     );
 
     final balance = invoice.total - invoice.paid;

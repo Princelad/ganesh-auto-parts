@@ -61,7 +61,7 @@ class _PinVerifyScreenState extends ConsumerState<PinVerifyScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Incorrect PIN (${_failedAttempts} failed attempt${_failedAttempts > 1 ? 's' : ''})',
+                'Incorrect PIN ($_failedAttempts failed attempt${_failedAttempts > 1 ? 's' : ''})',
               ),
               backgroundColor: Colors.red,
               action: _failedAttempts >= 3

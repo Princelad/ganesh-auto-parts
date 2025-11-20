@@ -105,7 +105,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                     error: (error, stack) =>
                         Text('Error loading customers: $error'),
                     data: (customers) => DropdownButtonFormField<Customer?>(
-                      value: _selectedCustomer,
+                      initialValue: _selectedCustomer,
                       decoration: const InputDecoration(
                         labelText: 'Customer',
                         border: OutlineInputBorder(),
@@ -415,7 +415,7 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                   children: [
                     // Item selection
                     DropdownButtonFormField<Item>(
-                      value: selectedItem,
+                      initialValue: selectedItem,
                       decoration: const InputDecoration(
                         labelText: 'Select Item *',
                         border: OutlineInputBorder(),
