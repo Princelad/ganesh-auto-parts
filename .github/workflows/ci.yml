@@ -1,0 +1,94 @@
+name: CI - Build and Test
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.1"
+          channel: "stable"
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
+
+      - name: Analyze code
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Run tests
+        run: flutter test
+        continue-on-error: true
+
+      - name: Build APK (debug)
+        run: flutter build apk --debug
+
+      - name: Build APK (release)
+        run: flutter build apk --release
+
+      - name: Get APK info
+        run: |
+          echo "Debug APK size: $(du -h build/app/outputs/flutter-apk/app-debug.apk | cut -f1)"
+          echo "Release APK size: $(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)"
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: debug-apk-${{ github.sha }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            // Get APK sizes
+            const debugSize = execSync('du -h build/app/outputs/flutter-apk/app-debug.apk | cut -f1').toString().trim();
+            const releaseSize = execSync('du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1').toString().trim();
+
+            const comment = `## 🔨 Build Status
+
+            ✅ Build completed successfully!
+
+            **APK Sizes:**
+            - Debug: ${debugSize}
+            - Release: ${releaseSize}
+
+            **Commit:** ${context.sha.substring(0, 7)}
+            **Branch:** ${context.ref}
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

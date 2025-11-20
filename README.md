@@ -2,14 +2,16 @@
 
 <div align="center">
   
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
-![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)
+![Flutter](https://img.shields.io/badge/Flutter-3.27.1-02569B?logo=flutter)
 ![License](https://img.shields.io/badge/license-Private-red.svg)
+![Build](https://img.shields.io/github/actions/workflow/status/Princelad/ganesh-auto-parts/release.yml?branch=master&label=build)
+![Release](https://img.shields.io/github/v/release/Princelad/ganesh-auto-parts)
 
 **Complete offline-first ERP solution for auto parts businesses**
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](#-documentation)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](#-documentation) • [Releases](https://github.com/Princelad/ganesh-auto-parts/releases)
 
 </div>
 
@@ -253,7 +255,60 @@ flutter pub get
 flutter run
 ```
 
-## 📞 Support
+## � Continuous Integration & Releases
+
+This project uses **GitHub Actions** for automated builds and releases.
+
+### Automated Release Process
+
+When you push a version tag, the CI automatically:
+
+1. ✅ Builds APK and AAB files
+2. ✅ Extracts changelog from CHANGELOG.md
+3. ✅ Creates GitHub Release
+4. ✅ Uploads release artifacts
+5. ✅ Adds build information
+
+**To create a release:**
+
+```bash
+# 1. Update version in pubspec.yaml
+version: 1.0.2+3
+
+# 2. Update CHANGELOG.md
+## [1.0.2] - 2025-11-20
+### Added
+- New feature
+
+# 3. Commit changes
+git add .
+git commit -m "chore: Bump version to 1.0.2"
+
+# 4. Create and push tag
+git tag -a v1.0.2 -m "Release v1.0.2"
+git push origin master
+git push origin v1.0.2
+
+# GitHub Actions will automatically build and create the release!
+```
+
+### Continuous Integration
+
+Every push and pull request automatically:
+
+- ✅ Runs code formatting checks
+- ✅ Runs static analysis
+- ✅ Runs all tests
+- ✅ Builds debug and release APKs
+- ✅ Comments build status on PRs
+
+**View workflows:** [GitHub Actions](https://github.com/Princelad/ganesh-auto-parts/actions)
+
+**Download releases:** [Releases Page](https://github.com/Princelad/ganesh-auto-parts/releases)
+
+For more details, see [`.github/workflows/README.md`](.github/workflows/README.md)
+
+## �📞 Support
 
 For support or queries:
 
