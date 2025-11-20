@@ -2,6 +2,21 @@
 
 All notable changes to Ganesh Auto Parts will be documented in this file.
 
+## [1.0.2] - 2025-11-20
+
+### Added
+- PDF invoice generation feature with professional layout
+- Export and share invoices as PDF files
+- Print invoices directly from the app
+- Company branding in PDF header
+- Detailed items table with SKU, quantity, and pricing
+- Payment status section showing paid amount and balance due
+- Support for all invoice types (paid/unpaid/partial, with/without customer)
+
+### Changed
+- Updated invoice details sheet with "Export as PDF" button
+- Enhanced invoice viewing experience
+
 ## [1.0.1] - 2025-11-19
 
 ### Fixed

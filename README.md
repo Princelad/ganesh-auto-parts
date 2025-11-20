@@ -44,6 +44,8 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 - Payment recording (full/partial)
 - Payment status tracking
 - Invoice search and filtering
+- **PDF invoice generation**
+- Share invoices as PDF (email, WhatsApp, etc.)
 
 ### 📊 Reports & Analytics
 
@@ -321,7 +323,6 @@ For support or queries:
 ### Upcoming Features
 
 - [ ] Barcode scanner for quick item lookup
-- [ ] PDF invoice generation
 - [ ] Advanced charts and analytics
 - [ ] Tax/GST support
 - [ ] Expense tracking
@@ -330,6 +331,19 @@ For support or queries:
 - [ ] SMS/Email notifications
 
 ## 📈 Version History
+
+### v1.0.2 (November 20, 2025)
+
+- ✅ PDF invoice generation
+- ✅ Share invoices as PDF
+- ✅ Professional invoice layout with company branding
+- ✅ GitHub Actions for automated releases
+
+### v1.0.1 (November 19, 2025)
+
+- ✅ Fixed LateInitializationError in providers
+- ✅ Fixed type error in invoice screen
+- ✅ Improved error handling
 
 ### v1.0.0 (November 19, 2025)
 
