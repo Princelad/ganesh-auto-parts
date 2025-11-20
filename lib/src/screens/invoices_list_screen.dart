@@ -4,10 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import '../models/invoice.dart';
 import '../models/customer.dart';
-import '../models/item.dart';
 import '../providers/invoice_provider.dart';
 import '../providers/customer_provider.dart';
-import '../providers/item_provider.dart';
+import '../providers/database_provider.dart';
 import '../widgets/dialogs.dart';
 import 'invoice_form_screen.dart';
 import '../services/pdf_service.dart';
@@ -699,31 +698,22 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
       );
 
       // Get invoice items
-      final invoiceItems =
-          await ref.read(invoiceItemsProvider(invoice.id!).future);
-
-      // Get all items
-      final allItemsAsync = ref.read(itemProvider);
-      final allItems = allItemsAsync.when(
-        data: (items) => items,
-        loading: () => <Item>[],
-        error: (_, __) => <Item>[],
+      final invoiceItems = await ref.read(
+        invoiceItemsProvider(invoice.id!).future,
       );
+
+      // Get all items directly from repository
+      final itemRepository = ref.read(itemRepositoryProvider);
+      final allItems = await itemRepository.getAll();
 
       // Get customer if exists
       Customer? customer;
       if (invoice.customerId != null) {
-        final customersAsync = ref.read(customerProvider);
-        final customers = customersAsync.when(
-          data: (customers) => customers,
-          loading: () => <Customer>[],
-          error: (_, __) => <Customer>[],
-        );
+        final customerRepository = ref.read(customerRepositoryProvider);
+        final customers = await customerRepository.getAll();
 
         try {
-          customer = customers.firstWhere(
-            (c) => c.id == invoice.customerId,
-          );
+          customer = customers.firstWhere((c) => c.id == invoice.customerId);
         } catch (e) {
           customer = null;
         }

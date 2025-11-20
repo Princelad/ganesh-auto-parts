@@ -18,7 +18,10 @@ class PdfService {
   }) async {
     final pdf = pw.Document();
     final dateFormat = DateFormat('dd/MM/yyyy');
-    final currencyFormat = NumberFormat.currency(symbol: '₹', decimalDigits: 2);
+    final currencyFormat = NumberFormat.currency(
+      symbol: 'Rs. ',
+      decimalDigits: 2,
+    );
 
     // Get item details for each invoice item
     final itemDetails = items.map((invoiceItem) {
@@ -104,10 +107,7 @@ class PdfService {
           pw.SizedBox(height: 5),
           pw.Text(
             'Auto Parts & Accessories',
-            style: const pw.TextStyle(
-              fontSize: 12,
-              color: PdfColors.grey700,
-            ),
+            style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
           ),
         ],
       ),
@@ -167,7 +167,10 @@ class PdfService {
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
             pw.Container(
-              padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const pw.EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
               decoration: pw.BoxDecoration(
                 color: PdfColors.blue50,
                 borderRadius: pw.BorderRadius.circular(4),
@@ -184,10 +187,7 @@ class PdfService {
             pw.SizedBox(height: 10),
             pw.Text(
               'Invoice No: ${invoice.invoiceNo}',
-              style: pw.TextStyle(
-                fontSize: 10,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
             ),
             pw.SizedBox(height: 3),
             pw.Text(
@@ -227,7 +227,11 @@ class PdfService {
             _buildTableCell('SKU', isHeader: true),
             _buildTableCell('Qty', isHeader: true, align: pw.TextAlign.center),
             _buildTableCell('Rate', isHeader: true, align: pw.TextAlign.right),
-            _buildTableCell('Amount', isHeader: true, align: pw.TextAlign.right),
+            _buildTableCell(
+              'Amount',
+              isHeader: true,
+              align: pw.TextAlign.right,
+            ),
           ],
         ),
         // Items
@@ -358,7 +362,10 @@ class PdfService {
             children: [
               pw.Text(
                 'Payment Status:',
-                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                style: const pw.TextStyle(
+                  fontSize: 10,
+                  color: PdfColors.grey700,
+                ),
               ),
               pw.SizedBox(height: 3),
               pw.Text(
