@@ -2,7 +2,7 @@
 
 <div align="center">
   
-![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.27.1-02569B?logo=flutter)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -24,10 +24,13 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 ### 📦 Inventory Management
 
 - Complete items database with SKU tracking
+- **Camera-based barcode scanner** for quick SKU entry (NEW in v1.5.0)
+- **Barcode generation and printing** (single labels & bulk sheets) (NEW in v1.5.0)
 - Stock level monitoring with reorder alerts
 - Company/brand organization
 - Real-time stock updates
 - Search and filter capabilities
+- Long-press items to view/print barcodes
 
 ### 👥 Customer Management
 
@@ -39,6 +42,7 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 ### 🧾 Invoicing
 
 - Create multi-item invoices
+- **Scan barcodes to add items** - quick invoice creation (NEW in v1.5.0)
 - Automatic invoice numbering
 - Stock deduction on invoice creation
 - Payment recording (full/partial)
@@ -49,6 +53,12 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 
 ### 📊 Reports & Analytics
 
+- **Business Analytics Dashboard** (NEW in v1.5.0)
+  - **Interactive Sales Trend Chart** - Daily sales visualization with smart scaling
+  - **Revenue Pie Chart** - Sales breakdown by company/brand
+  - **Top Items Bar Chart** - Best selling products ranked by revenue
+  - Date range filters (7D, 30D, 90D, 1Y, Custom)
+  - Summary cards (total sales, invoice count, average sale)
 - **Comprehensive Reports Suite** (v1.3.0)
   - **Stock Valuation Report** - Total inventory value with company breakdown
   - **Top Selling Items Report** - Ranked products by quantity sold
@@ -163,9 +173,12 @@ flutter build appbundle --release
 
 ## 🏗️ Technology Stack
 
-- **Framework**: Flutter (Dart)
+- **Framework**: Flutter 3.27.1 (Dart 3.9.2)
 - **Database**: SQLite (sqflite)
 - **State Management**: Riverpod 3.0.3
+- **Barcode**: mobile_scanner 7.1.3 (scanning) + barcode 2.2.9 (generation)
+- **Charts**: fl_chart 1.1.1 (interactive visualizations)
+- **PDF**: printing 5.14.2 + pdf 3.11.3 (invoice & label generation)
 - **Architecture**: Offline-first, Repository pattern
 - **Platform**: Android only
 
@@ -197,9 +210,14 @@ lib/
     ├── services/                # Business logic
     │   ├── csv_service.dart
     │   ├── backup_service.dart
-    │   └── auth_service.dart
+    │   ├── auth_service.dart
+    │   └── barcode_print_service.dart
     └── widgets/                 # Reusable widgets
-        └── dashboard_stats_widget.dart
+        ├── dashboard_stats_widget.dart
+        ├── barcode_display_widget.dart
+        ├── sales_trend_chart.dart
+        ├── revenue_pie_chart.dart
+        └── top_items_bar_chart.dart
 ```
 
 ## 🔧 Configuration
@@ -340,15 +358,41 @@ For support or queries:
 
 ### Upcoming Features
 
-- [ ] Barcode scanner for quick item lookup
-- [ ] Advanced charts and analytics
-- [ ] Tax/GST support
+- [ ] QR code support for items
+- [ ] Purchase order management
 - [ ] Expense tracking
 - [ ] Cloud sync with server
 - [ ] Multi-user support
 - [ ] SMS/Email notifications
+- [ ] Batch barcode printing with custom selection
 
 ## 📈 Version History
+
+### v1.5.0 (November 21, 2025)
+
+- ✅ **Barcode Scanner Integration**
+  - Camera-based barcode scanning (Code 128)
+  - Scan SKU when creating/editing items
+  - Scan to add items in invoices
+  - Scan to select items in stock adjustments
+  - Flash toggle and camera switch
+- ✅ **Barcode Printing System**
+  - Generate Code 128 barcodes for all items
+  - Print single labels (A6 format)
+  - Bulk printing (18 labels per A4 sheet in 3×6 grid)
+  - Print all items or only low stock items
+  - Professional labels with item name, company, SKU, and price
+- ✅ **Analytics Dashboard**
+  - Interactive sales trend line chart with date filtering
+  - Revenue breakdown pie chart by company
+  - Top selling items bar chart
+  - Smart chart scaling and intervals
+  - Summary statistics cards
+  - Integrated into Reports screen
+- ✅ **UI Improvements**
+  - Currency format changed to Rs. for better compatibility
+  - Enhanced chart visualizations with adaptive sizing
+  - Improved data presentation
 
 ### v1.4.0 (January 21, 2025)
 
