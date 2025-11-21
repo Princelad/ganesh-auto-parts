@@ -8,6 +8,7 @@ import 'reports_screen.dart';
 import 'csv_export_import_screen.dart';
 import 'invoices_list_screen.dart';
 import 'settings_screen.dart';
+import 'global_search_screen.dart';
 import '../widgets/dashboard_stats_widget.dart';
 import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
@@ -32,6 +33,16 @@ class HomePage extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GlobalSearchScreen(),
+              ),
+            ),
+            tooltip: 'Global Search',
+          ),
           IconButton(
             icon: const Icon(Icons.info_outline),
             onPressed: () => Navigator.pushNamed(context, '/about'),

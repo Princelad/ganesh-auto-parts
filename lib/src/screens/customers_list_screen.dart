@@ -104,29 +104,67 @@ class _CustomersListScreenState extends ConsumerState<CustomersListScreen> {
               data: (customers) {
                 if (customers.isEmpty) {
                   return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.people_outline,
-                          size: 64,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _searchQuery.isEmpty
-                              ? 'No customers yet'
-                              : 'No customers found',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _searchQuery.isEmpty
-                              ? 'Add your first customer using the + button'
-                              : 'Try a different search term',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _searchQuery.isEmpty
+                                ? Icons.people_outline
+                                : Icons.person_search,
+                            size: 80,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            _searchQuery.isEmpty
+                                ? 'No customers yet'
+                                : 'No customers found',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade700,
+                                ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _searchQuery.isEmpty
+                                ? 'Build your customer base by adding your first customer'
+                                : 'Try a different search term or check the spelling',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          if (_searchQuery.isEmpty) ...[
+                            const SizedBox(height: 32),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomerFormScreen(),
+                                  ),
+                                );
+                                if (result == true && mounted) {
+                                  ref
+                                      .read(customerProvider.notifier)
+                                      .loadCustomers();
+                                }
+                              },
+                              icon: const Icon(Icons.person_add),
+                              label: const Text('Add First Customer'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   );
                 }

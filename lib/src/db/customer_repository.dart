@@ -93,6 +93,11 @@ class CustomerRepository {
     return maps.map((map) => Customer.fromMap(map)).toList();
   }
 
+  /// Simple search method for global search
+  Future<List<Customer>> search(String query) async {
+    return await searchCustomers(query: query, limit: 20);
+  }
+
   /// Get customers with outstanding balance
   Future<List<Customer>> getCustomersWithBalance() async {
     final database = await _db.database;

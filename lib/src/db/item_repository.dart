@@ -93,6 +93,11 @@ class ItemRepository {
     return maps.map((map) => Item.fromMap(map)).toList();
   }
 
+  /// Simple search method for global search
+  Future<List<Item>> search(String query) async {
+    return await searchItems(query: query, limit: 20);
+  }
+
   /// Get items with low stock (below reorder level)
   Future<List<Item>> getLowStockItems() async {
     final database = await _db.database;

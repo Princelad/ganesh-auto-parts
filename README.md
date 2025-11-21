@@ -2,7 +2,7 @@
 
 <div align="center">
   
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.27.1-02569B?logo=flutter)
 ![License](https://img.shields.io/badge/license-Private-red.svg)
@@ -49,7 +49,7 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 
 ### 📊 Reports & Analytics
 
-- **Comprehensive Reports Suite** (NEW in v1.3.0)
+- **Comprehensive Reports Suite** (v1.3.0)
   - **Stock Valuation Report** - Total inventory value with company breakdown
   - **Top Selling Items Report** - Ranked products by quantity sold
   - **Sales by Period Report** - Daily, weekly, monthly sales analysis
@@ -58,6 +58,13 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 - Low stock alerts
 - Customer balance reports
 - **GST/Tax collection reports**
+
+### 🎨 UI/UX Enhancements (NEW in v1.4.0)
+
+- **Global Search** - Unified search across items, customers, and invoices
+- **Dashboard Quick Stats** - Today's and week's revenue at a glance
+- **Enhanced Empty States** - Helpful CTAs for first-time users
+- **Comprehensive About Page** - App info, features, tech stack, and credits
   - Tax collection by period
   - Breakdown by tax rate
   - Monthly trends
@@ -340,6 +347,37 @@ For support or queries:
 - [ ] SMS/Email notifications
 
 ## 📈 Version History
+
+### v1.4.0 (January 21, 2025)
+
+- ✅ Enhanced About Page with comprehensive information and GitHub link
+- ✅ Dashboard quick stats (today's and week's revenue)
+- ✅ Global search across items, customers, and invoices
+- ✅ Enhanced empty states with call-to-action buttons
+- ✅ Improved search text visibility
+- ✅ Better first-user experience
+
+### v1.3.0 (January 20, 2025)
+
+- ✅ Stock Valuation Report with company breakdown
+- ✅ Top Selling Items Report with date filtering
+- ✅ Sales by Period Report (daily/weekly/monthly)
+- ✅ Customer Insights Report with buying patterns
+- ✅ Complete reports suite implementation
+
+### v1.2.0 (November 20, 2025)
+
+- ✅ GST/Tax Reports with rate breakdown
+- ✅ Monthly GST trend analysis
+- ✅ Tax collection summary with date filtering
+- ✅ Complete tax reporting system
+
+### v1.1.0 (November 20, 2025)
+
+- ✅ GST/Tax system implementation
+- ✅ Tax configuration in settings
+- ✅ Rate-based tax calculation
+- ✅ Tax amounts on invoices
 
 ### v1.0.2 (November 20, 2025)
 

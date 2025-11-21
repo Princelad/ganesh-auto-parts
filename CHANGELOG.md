@@ -5,6 +5,62 @@ All notable changes to Ganesh Auto Parts ERP will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-01-21
+
+### Added
+
+- **UI Polish & Enhancements** - Major UX improvements release
+  - **Enhanced About Page**
+    - Comprehensive app information with version display (1.4.0 build 6)
+    - Feature highlights section with 8 key features and icons
+    - Tech stack information (Flutter 3.27.1, Dart 3.9.2, Riverpod, SQLite, Material Design 3)
+    - Developer information with functional GitHub repository link
+    - License and latest release information
+    - External URL launching capability
+  - **Dashboard Quick Stats**
+    - Today's revenue card with real-time sales data
+    - This week's revenue card (Monday to today)
+    - Color-coded revenue cards (green for today, indigo for week)
+  - **Global Search Feature**
+    - Unified search across items, customers, and invoices
+    - Debounced search with 500ms delay for performance
+    - Parallel search execution across all entity types
+    - Results grouped by type with count badges
+    - Custom card designs for each entity type (blue for items, green for customers, orange for invoices)
+    - Search tips in empty state
+    - Tap-to-navigate functionality for all results
+  - **Enhanced Empty States**
+    - Improved empty states in Items, Customers, and Invoices list screens
+    - Larger icons (80px) with better visual hierarchy
+    - "Call-to-Action" buttons (Add First Item, Add First Customer, Create First Invoice)
+    - Different icons and messaging for empty vs no-search-results states
+    - Better typography and spacing throughout
+- New repository methods:
+  - `InvoiceRepository.getTodayRevenue()` - Calculate today's sales revenue
+  - `InvoiceRepository.getWeekRevenue()` - Calculate this week's revenue
+  - `InvoiceRepository.search()` - Search invoices by invoice number
+  - `ItemRepository.search()` - Search items (wrapper with limit 20)
+  - `CustomerRepository.search()` - Search customers (wrapper with limit 20)
+- New providers in `invoice_provider.dart`:
+  - `todayRevenueProvider` - FutureProvider for today's revenue
+  - `weekRevenueProvider` - FutureProvider for week's revenue
+- New screen: `global_search_screen.dart` - Complete global search implementation (448 lines)
+- Search button added to home page AppBar
+
+### Changed
+
+- About Page completely rebuilt from minimal 30-line page to comprehensive 405-line information screen
+- Dashboard stats widget enhanced with revenue tracking before outstanding balance
+- Empty states in all list screens redesigned for better first-user experience
+- Text visibility improved in search bar (black text on light background)
+- Version bumped to 1.4.0+6
+
+### Fixed
+
+- Search TextField text visibility (changed from white to black text)
+- GitHub link in About Page (corrected URL and added error handling)
+- GitHub link compatibility with StatelessWidget (simplified async URL launching)
+
 ## [1.3.0] - 2025-01-20
 
 ### Added

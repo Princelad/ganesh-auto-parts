@@ -155,32 +155,68 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
 
                 if (filteredInvoices.isEmpty) {
                   return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.receipt_long,
-                          size: 64,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _searchQuery.isNotEmpty || _filterStatus != 'all'
-                              ? 'No invoices found'
-                              : 'No invoices yet',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _searchQuery.isNotEmpty || _filterStatus != 'all'
+                                ? Icons.receipt_long_outlined
+                                : Icons.receipt,
+                            size: 80,
+                            color: Colors.grey.shade400,
                           ),
-                        ),
-                        if (_searchQuery.isEmpty && _filterStatus == 'all') ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 24),
                           Text(
-                            'Tap + to create your first invoice',
-                            style: TextStyle(color: Colors.grey.shade600),
+                            _searchQuery.isNotEmpty || _filterStatus != 'all'
+                                ? 'No invoices found'
+                                : 'No invoices yet',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade700,
+                                ),
                           ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _searchQuery.isNotEmpty || _filterStatus != 'all'
+                                ? 'Try adjusting your search or filters'
+                                : 'Create your first invoice to start tracking sales',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          if (_searchQuery.isEmpty &&
+                              _filterStatus == 'all') ...[
+                            const SizedBox(height: 32),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const InvoiceFormScreen(),
+                                  ),
+                                );
+                                if (result == true && mounted) {
+                                  ref
+                                      .read(invoiceProvider.notifier)
+                                      .loadInvoices();
+                                }
+                              },
+                              icon: const Icon(Icons.add),
+                              label: const Text('Create First Invoice'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 16,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   );
                 }

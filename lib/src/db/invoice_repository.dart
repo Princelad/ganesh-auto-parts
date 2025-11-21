@@ -187,6 +187,20 @@ class InvoiceRepository {
     return maps.map((map) => Invoice.fromMap(map)).toList();
   }
 
+  /// Simple search method for global search (search by invoice number)
+  Future<List<Invoice>> search(String query) async {
+    final database = await _db.database;
+    final searchTerm = '%$query%';
+    final maps = await database.query(
+      'invoices',
+      where: 'invoiceNo LIKE ?',
+      whereArgs: [searchTerm],
+      orderBy: 'date DESC',
+      limit: 20,
+    );
+    return maps.map((map) => Invoice.fromMap(map)).toList();
+  }
+
   /// Update payment for an invoice
   Future<bool> updatePayment(int invoiceId, double newPaidAmount) async {
     final database = await _db.database;
@@ -314,6 +328,36 @@ class InvoiceRepository {
 
     final total = result.first['total'];
     return total != null ? (total as num).toDouble() : 0.0;
+  }
+
+  /// Get revenue for today (total sales)
+  Future<double> getTodayRevenue() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    return await getTotalSales(
+      startOfDay.millisecondsSinceEpoch,
+      endOfDay.millisecondsSinceEpoch,
+    );
+  }
+
+  /// Get revenue for this week (total sales)
+  Future<double> getWeekRevenue() async {
+    final now = DateTime.now();
+    // Start of week (Monday)
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final startOfWeekDate = DateTime(
+      startOfWeek.year,
+      startOfWeek.month,
+      startOfWeek.day,
+    );
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    return await getTotalSales(
+      startOfWeekDate.millisecondsSinceEpoch,
+      endOfDay.millisecondsSinceEpoch,
+    );
   }
 
   /// Check if invoice number exists

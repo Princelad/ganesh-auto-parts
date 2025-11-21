@@ -102,29 +102,65 @@ class _ItemsListScreenState extends ConsumerState<ItemsListScreen> {
               data: (items) {
                 if (items.isEmpty) {
                   return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.inventory_2_outlined,
-                          size: 64,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _searchQuery.isEmpty
-                              ? 'No items yet'
-                              : 'No items found',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _searchQuery.isEmpty
-                              ? 'Add your first item using the + button'
-                              : 'Try a different search term',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _searchQuery.isEmpty
+                                ? Icons.inventory_2_outlined
+                                : Icons.search_off,
+                            size: 80,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            _searchQuery.isEmpty
+                                ? 'No items yet'
+                                : 'No items found',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade700,
+                                ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _searchQuery.isEmpty
+                                ? 'Start managing your inventory by adding your first item'
+                                : 'Try a different search term or check your filters',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: Colors.grey.shade600),
+                          ),
+                          if (_searchQuery.isEmpty) ...[
+                            const SizedBox(height: 32),
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ItemFormScreen(),
+                                  ),
+                                );
+                                if (result == true && mounted) {
+                                  ref.read(itemProvider.notifier).loadItems();
+                                }
+                              },
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add First Item'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   );
                 }

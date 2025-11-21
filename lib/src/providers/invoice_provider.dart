@@ -160,3 +160,15 @@ final totalSalesProvider = FutureProvider.family<double, Map<String, int>>((
   final repository = ref.watch(invoiceRepositoryProvider);
   return await repository.getTotalSales(dateRange['start']!, dateRange['end']!);
 });
+
+/// Provider for today's revenue
+final todayRevenueProvider = FutureProvider<double>((ref) async {
+  final repository = ref.watch(invoiceRepositoryProvider);
+  return await repository.getTodayRevenue();
+});
+
+/// Provider for this week's revenue
+final weekRevenueProvider = FutureProvider<double>((ref) async {
+  final repository = ref.watch(invoiceRepositoryProvider);
+  return await repository.getWeekRevenue();
+});

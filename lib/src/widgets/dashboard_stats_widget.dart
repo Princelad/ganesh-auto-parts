@@ -15,6 +15,8 @@ class DashboardStatsWidget extends ConsumerWidget {
     final invoiceCountAsync = ref.watch(invoiceCountProvider);
     final outstandingBalanceAsync = ref.watch(totalOutstandingBalanceProvider);
     final lowStockItemsAsync = ref.watch(lowStockItemsProvider);
+    final todayRevenueAsync = ref.watch(todayRevenueProvider);
+    final weekRevenueAsync = ref.watch(weekRevenueProvider);
 
     return Card(
       margin: const EdgeInsets.all(16),
@@ -88,6 +90,65 @@ class DashboardStatsWidget extends ConsumerWidget {
                       label: 'Low Stock',
                       value: '-',
                       color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Revenue Cards
+            Row(
+              children: [
+                Expanded(
+                  child: todayRevenueAsync.when(
+                    data: (revenue) => _buildRevenueCard(
+                      context,
+                      'Today\'s Revenue',
+                      revenue,
+                      Icons.today,
+                      Colors.green,
+                    ),
+                    loading: () => _buildRevenueCard(
+                      context,
+                      'Today\'s Revenue',
+                      0,
+                      Icons.today,
+                      Colors.green,
+                      loading: true,
+                    ),
+                    error: (_, __) => _buildRevenueCard(
+                      context,
+                      'Today\'s Revenue',
+                      0,
+                      Icons.today,
+                      Colors.grey,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: weekRevenueAsync.when(
+                    data: (revenue) => _buildRevenueCard(
+                      context,
+                      'This Week',
+                      revenue,
+                      Icons.calendar_today,
+                      Colors.indigo,
+                    ),
+                    loading: () => _buildRevenueCard(
+                      context,
+                      'This Week',
+                      0,
+                      Icons.calendar_today,
+                      Colors.indigo,
+                      loading: true,
+                    ),
+                    error: (_, __) => _buildRevenueCard(
+                      context,
+                      'This Week',
+                      0,
+                      Icons.calendar_today,
+                      Colors.grey,
                     ),
                   ),
                 ),
@@ -216,6 +277,61 @@ class DashboardStatsWidget extends ConsumerWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRevenueCard(
+    BuildContext context,
+    String label,
+    double revenue,
+    IconData icon,
+    Color color, {
+    bool loading = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (loading)
+            const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            Text(
+              CurrencyHelper.format(revenue),
+              style: TextStyle(
+                color: color,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
         ],
       ),
     );
