@@ -48,134 +48,156 @@ class _ItemsListScreenState extends ConsumerState<ItemsListScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search items by name, SKU, or company...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearchChanged('');
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+      body: itemsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Error: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref.read(itemProvider.notifier).loadItems(),
+                child: const Text('Retry'),
               ),
-              onChanged: _onSearchChanged,
-            ),
+            ],
           ),
-
-          // Items list
-          Expanded(
-            child: itemsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text('Error: $error'),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () =>
-                          ref.read(itemProvider.notifier).loadItems(),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              ),
-              data: (items) {
-                if (items.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _searchQuery.isEmpty
-                                ? Icons.inventory_2_outlined
-                                : Icons.search_off,
-                            size: 80,
-                            color: Colors.grey.shade400,
+        ),
+        data: (items) {
+          final lowStockItems = items
+              .where((item) => item.stock <= item.reorderLevel)
+              .toList();
+          return Column(
+            children: [
+              // Low stock notification banner
+              if (lowStockItems.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  color: Colors.red.shade100,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning, color: Colors.red),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Warning: ${lowStockItems.length} item(s) are low on stock!',
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 24),
-                          Text(
-                            _searchQuery.isEmpty
-                                ? 'No items yet'
-                                : 'No items found',
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade700,
-                                ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            _searchQuery.isEmpty
-                                ? 'Start managing your inventory by adding your first item'
-                                : 'Try a different search term or check your filters',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(color: Colors.grey.shade600),
-                          ),
-                          if (_searchQuery.isEmpty) ...[
-                            const SizedBox(height: 32),
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ItemFormScreen(),
-                                  ),
-                                );
-                                if (result == true && mounted) {
-                                  ref.read(itemProvider.notifier).loadItems();
-                                }
-                              },
-                              icon: const Icon(Icons.add),
-                              label: const Text('Add First Item'),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search items by name, SKU, or company...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return _buildItemCard(context, item);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                  ),
+                  onChanged: _onSearchChanged,
+                ),
+              ),
+              // Items list
+              Expanded(
+                child: items.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _searchQuery.isEmpty
+                                    ? Icons.inventory_2_outlined
+                                    : Icons.search_off,
+                                size: 80,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                _searchQuery.isEmpty
+                                    ? 'No items yet'
+                                    : 'No items found',
+                                style: Theme.of(context).textTheme.headlineSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey.shade700,
+                                    ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                _searchQuery.isEmpty
+                                    ? 'Start managing your inventory by adding your first item'
+                                    : 'Try a different search term or check your filters',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(color: Colors.grey.shade600),
+                              ),
+                              if (_searchQuery.isEmpty) ...[
+                                const SizedBox(height: 32),
+                                ElevatedButton.icon(
+                                  onPressed: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ItemFormScreen(),
+                                      ),
+                                    );
+                                    if (result == true && mounted) {
+                                      ref
+                                          .read(itemProvider.notifier)
+                                          .loadItems();
+                                    }
+                                  },
+                                  icon: const Icon(Icons.add),
+                                  label: const Text('Add First Item'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 32,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          return _buildItemCard(context, item);
+                        },
+                      ),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToItemForm(context, null),
