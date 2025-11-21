@@ -110,11 +110,12 @@ Ganesh Auto Parts is a comprehensive Android ERP application designed specifical
 
 ### Install from APK
 
-1. Download `GaneshAutoParts-v1.0.0-release.apk` from the `releases/` folder
-2. Transfer to your Android device
-3. Enable "Install from Unknown Sources" in Settings
-4. Tap the APK file to install
-5. Open "Ganesh Auto Parts" from your app drawer
+1. Visit the GitHub Releases page: https://github.com/Princelad/ganesh-auto-parts/releases
+2. Find the desired release and download the APK asset (e.g. GaneshAutoParts-v1.0.0-release.apk).
+3. You can download the APK directly on your Android device (recommended) or download to your computer and transfer it to the device.
+4. On the device enable "Install from Unknown Sources" for your file manager or browser (Settings → Apps & notifications → Special app access → Install unknown apps).
+5. Open the APK file to install the app.
+6. Launch "Ganesh Auto Parts" from your app drawer.
 
 ### Build from Source
 
@@ -293,66 +294,11 @@ flutter pub get
 flutter run
 ```
 
-## � Continuous Integration & Releases
-
-This project uses **GitHub Actions** for automated builds and releases.
-
-### Automated Release Process
-
-When you push a version tag, the CI automatically:
-
-1. ✅ Builds APK and AAB files
-2. ✅ Extracts changelog from CHANGELOG.md
-3. ✅ Creates GitHub Release
-4. ✅ Uploads release artifacts
-5. ✅ Adds build information
-
-**To create a release:**
-
-```bash
-# 1. Update version in pubspec.yaml
-version: 1.0.2+3
-
-# 2. Update CHANGELOG.md
-## [1.0.2] - 2025-11-20
-### Added
-- New feature
-
-# 3. Commit changes
-git add .
-git commit -m "chore: Bump version to 1.0.2"
-
-# 4. Create and push tag
-git tag -a v1.0.2 -m "Release v1.0.2"
-git push origin master
-git push origin v1.0.2
-
-# GitHub Actions will automatically build and create the release!
-```
-
-### Continuous Integration
-
-Every push and pull request automatically:
-
-- ✅ Runs code formatting checks
-- ✅ Runs static analysis
-- ✅ Runs all tests
-- ✅ Builds debug and release APKs
-- ✅ Comments build status on PRs
-
-**View workflows:** [GitHub Actions](https://github.com/Princelad/ganesh-auto-parts/actions)
-
-**Download releases:** [Releases Page](https://github.com/Princelad/ganesh-auto-parts/releases)
-
-For more details, see [`.github/workflows/README.md`](.github/workflows/README.md)
-
 ## �📞 Support
 
 For support or queries:
 
 - Check the in-app **About** page
-- Review `PROJECT_DOCUMENTATION.md` for detailed information
-- Check `BUILD_INFO.txt` in releases folder
 
 ## 🎯 Roadmap
 
