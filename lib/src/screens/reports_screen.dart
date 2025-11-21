@@ -8,6 +8,7 @@ import 'stock_valuation_report_screen.dart';
 import 'top_selling_items_report_screen.dart';
 import 'sales_by_period_report_screen.dart';
 import 'customer_insights_report_screen.dart';
+import 'analytics_screen.dart';
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
@@ -36,6 +37,21 @@ class ReportsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Analytics Dashboard Section
+          _buildSectionHeader(context, 'Analytics Dashboard', Icons.analytics),
+          const SizedBox(height: 12),
+          _buildReportCard(
+            context,
+            icon: Icons.show_chart,
+            title: 'Business Analytics',
+            subtitle: 'Interactive charts and visual insights',
+            color: Colors.pink,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
             ),
           ),
           const SizedBox(height: 24),

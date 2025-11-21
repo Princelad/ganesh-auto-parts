@@ -116,7 +116,7 @@ class DashboardStatsWidget extends ConsumerWidget {
                       Colors.green,
                       loading: true,
                     ),
-                    error: (_, __) => _buildRevenueCard(
+                    error: (_, _) => _buildRevenueCard(
                       context,
                       'Today\'s Revenue',
                       0,
@@ -143,7 +143,7 @@ class DashboardStatsWidget extends ConsumerWidget {
                       Colors.indigo,
                       loading: true,
                     ),
-                    error: (_, __) => _buildRevenueCard(
+                    error: (_, _) => _buildRevenueCard(
                       context,
                       'This Week',
                       0,

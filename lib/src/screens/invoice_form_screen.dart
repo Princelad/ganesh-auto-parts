@@ -10,6 +10,7 @@ import '../providers/item_provider.dart';
 import '../providers/customer_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/dialogs.dart';
+import 'barcode_scanner_screen.dart';
 
 class InvoiceFormScreen extends ConsumerStatefulWidget {
   const InvoiceFormScreen({super.key});
@@ -190,10 +191,19 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: () => _showAddItemDialog(itemsAsync),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Item'),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => _scanAndAddItem(itemsAsync),
+                            icon: const Icon(Icons.qr_code_scanner),
+                            tooltip: 'Scan Barcode',
+                          ),
+                          TextButton.icon(
+                            onPressed: () => _showAddItemDialog(itemsAsync),
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Item'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -475,6 +485,138 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
         _selectedDate = picked;
       });
     }
+  }
+
+  Future<void> _scanAndAddItem(AsyncValue<List<Item>> itemsAsync) async {
+    try {
+      // Scan barcode
+      final scannedCode = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
+      );
+
+      if (scannedCode == null || scannedCode.isEmpty) return;
+
+      // Find item by SKU
+      itemsAsync.whenData((items) {
+        final matchingItem = items
+            .where(
+              (item) => item.sku.toLowerCase() == scannedCode.toLowerCase(),
+            )
+            .toList();
+
+        if (matchingItem.isEmpty) {
+          showErrorSnackBar(context, 'No item found with SKU: $scannedCode');
+          return;
+        }
+
+        if (matchingItem.length > 1) {
+          // Multiple items found, show selection dialog
+          _showMultipleItemsDialog(matchingItem);
+          return;
+        }
+
+        // Single item found, add it directly
+        final item = matchingItem.first;
+
+        // Check if already added
+        final existingIndex = _lineItems.indexWhere(
+          (lineItem) => lineItem.itemId == item.id,
+        );
+
+        if (existingIndex != -1) {
+          // Item already in list, increment quantity
+          setState(() {
+            final existing = _lineItems[existingIndex];
+            _lineItems[existingIndex] = _LineItem(
+              itemId: existing.itemId,
+              itemName: existing.itemName,
+              itemSku: existing.itemSku,
+              quantity: existing.quantity + 1,
+              unitPrice: existing.unitPrice,
+              availableStock: existing.availableStock,
+            );
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Increased quantity of ${item.name}'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        } else {
+          // Add new item with quantity 1
+          setState(() {
+            _lineItems.add(
+              _LineItem(
+                itemId: item.id!,
+                itemName: item.name,
+                itemSku: item.sku,
+                quantity: 1,
+                unitPrice: item.unitPrice,
+                availableStock: item.stock,
+              ),
+            );
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Added ${item.name}'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'Error scanning barcode: $e');
+    }
+  }
+
+  void _showMultipleItemsDialog(List<Item> items) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Multiple Items Found'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Multiple items found with this SKU:'),
+            const SizedBox(height: 16),
+            ...items.map(
+              (item) => ListTile(
+                title: Text(item.name),
+                subtitle: Text(
+                  '${item.company ?? 'No company'} - Stock: ${item.stock}',
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  // Add the selected item
+                  setState(() {
+                    _lineItems.add(
+                      _LineItem(
+                        itemId: item.id!,
+                        itemName: item.name,
+                        itemSku: item.sku,
+                        quantity: 1,
+                        unitPrice: item.unitPrice,
+                        availableStock: item.stock,
+                      ),
+                    );
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showAddItemDialog(AsyncValue<List<Item>> itemsAsync) {

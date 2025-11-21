@@ -4,6 +4,8 @@ import '../providers/item_provider.dart';
 import '../models/item.dart';
 import '../utils/currency_helper.dart';
 import 'item_form_screen.dart';
+import '../widgets/barcode_display_widget.dart';
+import '../services/barcode_print_service.dart';
 
 class ItemsListScreen extends ConsumerStatefulWidget {
   const ItemsListScreen({super.key});
@@ -96,28 +98,69 @@ class _ItemsListScreenState extends ConsumerState<ItemsListScreen> {
                     ],
                   ),
                 ),
-              // Search bar
+              // Search bar with print button
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search items by name, SKU, or company...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                            },
-                          )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search items by name, SKU, or company...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    _onSearchChanged('');
+                                  },
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onChanged: _onSearchChanged,
+                      ),
                     ),
-                  ),
-                  onChanged: _onSearchChanged,
+                    const SizedBox(width: 8),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.print),
+                      tooltip: 'Print Barcodes',
+                      onSelected: (value) {
+                        if (value == 'print_all') {
+                          _printAllBarcodes(context, items);
+                        } else if (value == 'print_low_stock') {
+                          _printLowStockBarcodes(context, lowStockItems);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'print_all',
+                          child: Row(
+                            children: [
+                              Icon(Icons.print),
+                              SizedBox(width: 8),
+                              Text('Print All Items'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'print_low_stock',
+                          enabled: lowStockItems.isNotEmpty,
+                          child: Row(
+                            children: [
+                              Icon(Icons.warning),
+                              SizedBox(width: 8),
+                              Text('Print Low Stock'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               // Items list
@@ -259,11 +302,32 @@ class _ItemsListScreenState extends ConsumerState<ItemsListScreen> {
             ),
           ],
         ),
-        trailing: Text(
-          CurrencyHelper.format(item.unitPrice),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              CurrencyHelper.format(item.unitPrice),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Icon(Icons.qr_code, size: 16, color: Colors.grey.shade600),
+          ],
         ),
         onTap: () => _navigateToItemForm(context, item),
+        onLongPress: () => _showBarcodeDialog(context, item),
+      ),
+    );
+  }
+
+  void _showBarcodeDialog(BuildContext context, Item item) {
+    showDialog(
+      context: context,
+      builder: (context) => BarcodeDialogWidget(
+        sku: item.sku,
+        itemName: item.name,
+        company: item.company,
+        price: item.unitPrice,
       ),
     );
   }
@@ -276,6 +340,71 @@ class _ItemsListScreenState extends ConsumerState<ItemsListScreen> {
 
     if (result == true && mounted) {
       ref.read(itemProvider.notifier).loadItems();
+    }
+  }
+
+  Future<void> _printAllBarcodes(BuildContext context, List<Item> items) async {
+    if (items.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No items to print')));
+      return;
+    }
+
+    try {
+      final itemsData = items.map((item) {
+        return {
+          'sku': item.sku,
+          'name': item.name,
+          'company': item.company,
+          'price': item.unitPrice,
+        };
+      }).toList();
+
+      await BarcodePrintService.printBarcodeSheet(items: itemsData);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Print error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _printLowStockBarcodes(
+    BuildContext context,
+    List<Item> items,
+  ) async {
+    if (items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No low stock items to print')),
+      );
+      return;
+    }
+
+    try {
+      final itemsData = items.map((item) {
+        return {
+          'sku': item.sku,
+          'name': item.name,
+          'company': item.company,
+          'price': item.unitPrice,
+        };
+      }).toList();
+
+      await BarcodePrintService.printBarcodeSheet(items: itemsData);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Print error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

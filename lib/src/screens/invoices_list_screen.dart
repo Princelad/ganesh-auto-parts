@@ -648,19 +648,31 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
                 return;
               }
 
-              Navigator.pop(context);
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+              navigator.pop();
 
               final newPaid = invoice.paid + amount;
               final success = await ref
                   .read(invoiceProvider.notifier)
                   .updatePayment(invoice.id!, newPaid);
 
-              if (mounted) {
-                if (success) {
-                  showSuccessSnackBar(context, 'Payment recorded successfully');
-                } else {
-                  showErrorSnackBar(context, 'Failed to record payment');
-                }
+              if (!mounted) return;
+              if (success) {
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Payment recorded successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to record payment'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             child: const Text('Record'),
@@ -685,18 +697,30 @@ class _InvoicesListScreenState extends ConsumerState<InvoicesListScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+              navigator.pop();
 
               final success = await ref
                   .read(invoiceProvider.notifier)
                   .deleteInvoice(invoice.id!);
 
-              if (mounted) {
-                if (success) {
-                  showSuccessSnackBar(context, 'Invoice deleted successfully');
-                } else {
-                  showErrorSnackBar(context, 'Failed to delete invoice');
-                }
+              if (!mounted) return;
+              if (success) {
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Invoice deleted successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Failed to delete invoice'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
             },
             style: ElevatedButton.styleFrom(

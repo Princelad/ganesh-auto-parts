@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/item.dart';
 import '../providers/item_provider.dart';
 import '../widgets/dialogs.dart';
+import 'barcode_scanner_screen.dart';
 
 class StockAdjustmentScreen extends ConsumerStatefulWidget {
   const StockAdjustmentScreen({super.key});
@@ -58,24 +59,40 @@ class _StockAdjustmentScreenState extends ConsumerState<StockAdjustmentScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Item selection
-            InkWell(
-              onTap: _pickItem,
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Select Item *',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.search),
-                ),
-                child: Text(
-                  _selectedItem?.name ?? 'Tap to select an item',
-                  style: TextStyle(
-                    color: _selectedItem == null
-                        ? Colors.grey
-                        : Theme.of(context).textTheme.bodyLarge?.color,
+            // Item selection with scan button
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: _pickItem,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Select Item *',
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.search),
+                      ),
+                      child: Text(
+                        _selectedItem?.name ?? 'Tap to select an item',
+                        style: TextStyle(
+                          color: _selectedItem == null
+                              ? Colors.grey
+                              : Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                IconButton.filled(
+                  onPressed: _scanBarcode,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'Scan Barcode',
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
             ),
             if (_selectedItem != null) ...[
               const SizedBox(height: 8),
@@ -380,6 +397,80 @@ class _StockAdjustmentScreenState extends ConsumerState<StockAdjustmentScreen> {
       setState(() {
         _selectedItem = item;
       });
+    }
+  }
+
+  Future<void> _scanBarcode() async {
+    final scannedCode = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
+    );
+
+    if (scannedCode == null || !mounted) return;
+
+    // Search for item by SKU
+    final itemsAsync = ref.read(itemProvider);
+    final items = itemsAsync.value ?? [];
+
+    final matchingItems = items
+        .where((item) => item.sku.toLowerCase() == scannedCode.toLowerCase())
+        .toList();
+
+    if (matchingItems.isEmpty) {
+      if (!mounted) return;
+      showErrorSnackBar(context, 'No item found with SKU: $scannedCode');
+      return;
+    }
+
+    if (matchingItems.length == 1) {
+      // Single match - select it
+      setState(() {
+        _selectedItem = matchingItems.first;
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Item selected: ${matchingItems.first.name}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // Multiple matches - show dialog
+      if (!mounted) return;
+      final selectedItem = await showDialog<Item>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Multiple Items Found'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Found ${matchingItems.length} items with SKU: $scannedCode',
+              ),
+              const SizedBox(height: 16),
+              ...matchingItems.map(
+                (item) => ListTile(
+                  title: Text(item.name),
+                  subtitle: Text('Stock: ${item.stock}'),
+                  onTap: () => Navigator.pop(context, item),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      );
+
+      if (selectedItem != null) {
+        setState(() {
+          _selectedItem = selectedItem;
+        });
+      }
     }
   }
 

@@ -7,12 +7,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2025-01-22
+
+### Added
+
+- **Barcode Scanner & Generation** - Complete barcode integration
+  - **Barcode Scanning**
+    - Full-screen camera scanner with visual overlay and cutout
+    - Support for multiple barcode formats (EAN-8, EAN-13, UPC-A, UPC-E, Code 39, Code 93, Code 128, ITF, QR Code, etc.)
+    - Flash toggle and camera switching capabilities
+    - Auto-detection with haptic feedback on successful scan
+    - Scan button in Item Form screen to populate SKU field
+    - Scan-to-add items feature in Invoice Form screen
+    - **Scan button in Stock Adjustment screen to quickly select items**
+    - Handles multiple items with same SKU (shows selection dialog)
+  - **Barcode Display & Generation**
+    - Long-press on items in Items List to view barcode
+    - Code 128 barcode generation and display
+    - Barcode icon indicator on list items
+    - Full-screen barcode dialog for easy scanning
+  - **Barcode Printing** - Professional barcode label printing
+    - Print single barcode labels with item name, company, SKU, and price
+    - Bulk print barcode sheets (2x4 labels per A4 page)
+    - Print all items or filter by low stock items
+    - Print button in barcode dialog for individual items
+    - Print menu in Items List screen for batch printing
+    - PDF generation with A6 format for single labels
+    - Professional label layout with proper spacing and borders
+  - **Camera Permissions**
+    - Configured CAMERA permission in AndroidManifest.xml
+    - Hardware camera features declared
+  - New Dependencies:
+    - `mobile_scanner: ^7.1.3` - Camera-based barcode scanning
+    - `barcode_widget: ^2.0.4` - Barcode generation and display
+    - `printing: ^5.14.2` - PDF printing and preview (already included)
+    - `pdf: ^3.11.3` - PDF document generation (already included)
+- **Analytics & Charts** - Comprehensive business intelligence dashboard
+  - **Analytics Screen**
+    - Interactive date range selection (7D, 30D, 90D, 1Y, Custom)
+    - Custom date range picker for flexible analysis
+    - Summary cards showing total sales, invoice count, and average sale
+    - Pull-to-refresh functionality for live data updates
+  - **Sales Trend Line Chart**
+    - Daily sales visualization with curved lines
+    - Interactive tooltips showing date, sales amount, and invoice count
+    - Gradient area fill below the line
+    - Responsive Y-axis with smart currency formatting (K for thousands, L for lakhs)
+    - Date labels on X-axis (MMM dd format)
+  - **Revenue Breakdown Pie Chart**
+    - Revenue by Company pie chart for brand/manufacturer analysis
+    - Interactive touch feedback with section highlighting
+    - Percentage labels on segments
+    - Detailed legend with absolute values
+    - Center space design for better readability
+  - **Top Selling Items Bar Chart**
+    - Horizontal bar chart showing top 10 items by quantity sold
+    - Interactive tooltips with item name, quantity, and revenue
+    - Background bars for visual reference
+    - Truncated labels to prevent overflow
+    - Smart value formatting
+  - **New Repository Methods**:
+    - `InvoiceRepository.getDailySales()` - Get daily sales data for date range
+    - `InvoiceRepository.getSalesByHour()` - Get hourly sales pattern for a day
+    - `InvoiceRepository.getSalesTrends()` - Get aggregate trends (total, avg, min, max)
+    - `ItemRepository.getTopSellingItems()` - Get best-selling items with filters
+    - `ItemRepository.getSalesByCompany()` - Revenue breakdown by company/manufacturer
+  - New Dependencies:
+    - `fl_chart: ^1.1.1` - Beautiful, interactive charts and graphs
+  - **Reports Screen Integration**:
+    - Analytics Dashboard integrated into Reports screen
+    - New "Analytics Dashboard" section at the top with visual charts
+    - Access via Reports → Business Analytics
+    - Consolidated all reporting and analytics in one place
+
 ### Changed
 
 - **License**: Project is now open source under MIT License
   - Updated LICENSE file to MIT License
   - Updated README.md license badge from Private to MIT
   - Updated About Page to reflect open source MIT License
+
+### Fixed
+
+- Fixed BuildContext usage across async gaps (8 warnings resolved)
+  - Captured Navigator and ScaffoldMessenger before async operations in invoices list
+  - Captured context references before async PIN reset in PIN verify screen
+- Replaced deprecated `withOpacity()` with `withValues(alpha:)` for Material 3 compatibility
 
 ## [1.4.0] - 2025-01-21
 

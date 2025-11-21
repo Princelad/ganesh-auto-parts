@@ -716,4 +716,126 @@ class InvoiceRepository {
       };
     }).toList();
   }
+
+  /// Get daily sales data for a date range (for charts)
+  Future<List<Map<String, dynamic>>> getDailySales({
+    required int startDate,
+    required int endDate,
+  }) async {
+    final database = await _db.database;
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        date,
+        COUNT(*) as invoiceCount,
+        SUM(total) as totalSales,
+        SUM(paid) as totalPaid,
+        AVG(total) as avgSale
+      FROM invoices
+      WHERE date >= ? AND date <= ?
+      GROUP BY date
+      ORDER BY date ASC
+    ''',
+      [startDate, endDate],
+    );
+
+    return result.map((row) {
+      return {
+        'date': row['date'] as int,
+        'invoiceCount': row['invoiceCount'] as int,
+        'totalSales': (row['totalSales'] as num).toDouble(),
+        'totalPaid': (row['totalPaid'] as num).toDouble(),
+        'avgSale': (row['avgSale'] as num).toDouble(),
+      };
+    }).toList();
+  }
+
+  /// Get sales by hour (for daily pattern analysis)
+  Future<List<Map<String, dynamic>>> getSalesByHour(int date) async {
+    final database = await _db.database;
+
+    // Get all invoices for the day
+    final startOfDay = DateTime.fromMillisecondsSinceEpoch(date);
+    final endOfDay = DateTime(
+      startOfDay.year,
+      startOfDay.month,
+      startOfDay.day,
+      23,
+      59,
+      59,
+    );
+
+    final invoices = await database.query(
+      'invoices',
+      where: 'date >= ? AND date <= ?',
+      whereArgs: [
+        startOfDay.millisecondsSinceEpoch,
+        endOfDay.millisecondsSinceEpoch,
+      ],
+    );
+
+    // Group by hour
+    final Map<int, double> hourlyMap = {};
+    for (var row in invoices) {
+      final invoiceDate = row['date'] as int;
+      final dateTime = DateTime.fromMillisecondsSinceEpoch(invoiceDate);
+      final hour = dateTime.hour;
+      final total = (row['total'] as num).toDouble();
+      hourlyMap[hour] = (hourlyMap[hour] ?? 0) + total;
+    }
+
+    // Convert to list
+    return List.generate(24, (hour) {
+      return {'hour': hour, 'total': hourlyMap[hour] ?? 0.0};
+    });
+  }
+
+  /// Get sales trends (last 7 days, 30 days, etc.)
+  Future<Map<String, dynamic>> getSalesTrends(int days) async {
+    final database = await _db.database;
+    final now = DateTime.now();
+    final startDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: days)).millisecondsSinceEpoch;
+    final endDate = DateTime.now().millisecondsSinceEpoch;
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        COUNT(*) as totalInvoices,
+        SUM(total) as totalSales,
+        SUM(paid) as totalPaid,
+        AVG(total) as avgSale,
+        MIN(total) as minSale,
+        MAX(total) as maxSale
+      FROM invoices
+      WHERE date >= ? AND date <= ?
+    ''',
+      [startDate, endDate],
+    );
+
+    if (result.isEmpty) {
+      return {
+        'totalInvoices': 0,
+        'totalSales': 0.0,
+        'totalPaid': 0.0,
+        'avgSale': 0.0,
+        'minSale': 0.0,
+        'maxSale': 0.0,
+      };
+    }
+
+    final row = result.first;
+    return {
+      'totalInvoices': row['totalInvoices'] as int,
+      'totalSales': (row['totalSales'] as num?)?.toDouble() ?? 0.0,
+      'totalPaid': (row['totalPaid'] as num?)?.toDouble() ?? 0.0,
+      'avgSale': (row['avgSale'] as num?)?.toDouble() ?? 0.0,
+      'minSale': (row['minSale'] as num?)?.toDouble() ?? 0.0,
+      'maxSale': (row['maxSale'] as num?)?.toDouble() ?? 0.0,
+    };
+  }
 }

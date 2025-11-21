@@ -285,4 +285,97 @@ class ItemRepository {
 
     return result.map((row) => row['company'] as String).toList();
   }
+
+  /// Get top selling items (for charts)
+  Future<List<Map<String, dynamic>>> getTopSellingItems({
+    required int limit,
+    int? startDate,
+    int? endDate,
+  }) async {
+    final database = await _db.database;
+
+    String whereClause = '';
+    List<dynamic> whereArgs = [];
+
+    if (startDate != null && endDate != null) {
+      whereClause = 'WHERE i.date >= ? AND i.date <= ?';
+      whereArgs = [startDate, endDate];
+    }
+
+    final result = await database.rawQuery(
+      '''
+      SELECT 
+        it.id,
+        it.name,
+        it.sku,
+        it.company,
+        it.unitPrice,
+        SUM(ii.qty) as totalQuantity,
+        SUM(ii.lineTotal) as totalRevenue,
+        COUNT(DISTINCT ii.invoiceId) as invoiceCount
+      FROM items it
+      INNER JOIN invoice_items ii ON it.id = ii.itemId
+      INNER JOIN invoices i ON ii.invoiceId = i.id
+      $whereClause
+      GROUP BY it.id
+      ORDER BY totalQuantity DESC
+      LIMIT ?
+    ''',
+      [...whereArgs, limit],
+    );
+
+    return result.map((row) {
+      return {
+        'itemId': row['id'] as int,
+        'name': row['name'] as String,
+        'sku': row['sku'] as String,
+        'company': row['company'] as String?,
+        'unitPrice': (row['unitPrice'] as num).toDouble(),
+        'totalQuantity': (row['totalQuantity'] as num).toDouble(),
+        'totalRevenue': (row['totalRevenue'] as num).toDouble(),
+        'invoiceCount': row['invoiceCount'] as int,
+      };
+    }).toList();
+  }
+
+  /// Get sales by company (for pie charts)
+  Future<List<Map<String, dynamic>>> getSalesByCompany({
+    int? startDate,
+    int? endDate,
+  }) async {
+    final database = await _db.database;
+
+    String whereClause = '';
+    List<dynamic> whereArgs = [];
+
+    if (startDate != null && endDate != null) {
+      whereClause = 'WHERE i.date >= ? AND i.date <= ?';
+      whereArgs = [startDate, endDate];
+    }
+
+    final result = await database.rawQuery('''
+      SELECT 
+        COALESCE(it.company, 'Unknown') as company,
+        SUM(ii.qty) as totalQuantity,
+        SUM(ii.lineTotal) as totalRevenue,
+        COUNT(DISTINCT ii.invoiceId) as invoiceCount,
+        COUNT(DISTINCT it.id) as itemCount
+      FROM items it
+      INNER JOIN invoice_items ii ON it.id = ii.itemId
+      INNER JOIN invoices i ON ii.invoiceId = i.id
+      $whereClause
+      GROUP BY it.company
+      ORDER BY totalRevenue DESC
+    ''', whereArgs);
+
+    return result.map((row) {
+      return {
+        'company': row['company'] as String,
+        'totalQuantity': (row['totalQuantity'] as num).toDouble(),
+        'totalRevenue': (row['totalRevenue'] as num).toDouble(),
+        'invoiceCount': row['invoiceCount'] as int,
+        'itemCount': row['itemCount'] as int,
+      };
+    }).toList();
+  }
 }

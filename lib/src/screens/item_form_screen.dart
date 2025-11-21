@@ -4,6 +4,7 @@ import '../models/item.dart';
 import '../providers/item_provider.dart';
 import '../utils/validators.dart';
 import '../utils/date_helper.dart';
+import 'barcode_scanner_screen.dart';
 
 class ItemFormScreen extends ConsumerStatefulWidget {
   final Item? item;
@@ -107,6 +108,29 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
     }
   }
 
+  Future<void> _scanBarcode() async {
+    try {
+      final scannedCode = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
+      );
+
+      if (scannedCode != null && scannedCode.isNotEmpty) {
+        setState(() {
+          _skuController.text = scannedCode;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error scanning barcode: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> _deleteItem() async {
     if (widget.item?.id == null) return;
 
@@ -180,10 +204,15 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
           children: [
             TextFormField(
               controller: _skuController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'SKU *',
                 hintText: 'e.g., PART-001',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  onPressed: _isLoading ? null : _scanBarcode,
+                  tooltip: 'Scan Barcode',
+                ),
               ),
               validator: Validators.validateSku,
               enabled: !_isLoading,

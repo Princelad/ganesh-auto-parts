@@ -109,20 +109,22 @@ class _PinVerifyScreenState extends ConsumerState<PinVerifyScreen> {
           TextButton(
             onPressed: () async {
               final authService = ref.read(authServiceProvider);
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+
               await authService.resetPin();
               ref.invalidate(isPinSetProvider);
 
-              if (mounted) {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context, true); // Close verify screen
+              if (!mounted) return;
+              navigator.pop(); // Close dialog
+              navigator.pop(true); // Close verify screen
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('PIN has been reset'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-              }
+              scaffoldMessenger.showSnackBar(
+                const SnackBar(
+                  content: Text('PIN has been reset'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Reset'),
