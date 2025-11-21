@@ -5,6 +5,15 @@ All notable changes to Ganesh Auto Parts ERP will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **License**: Project is now open source under MIT License
+  - Updated LICENSE file to MIT License
+  - Updated README.md license badge from Private to MIT
+  - Updated About Page to reflect open source MIT License
+
 ## [1.4.0] - 2025-01-21
 
 ### Added

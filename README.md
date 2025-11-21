@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.27.1-02569B?logo=flutter)
-![License](https://img.shields.io/badge/license-Private-red.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Build](https://img.shields.io/github/actions/workflow/status/Princelad/ganesh-auto-parts/release.yml?branch=master&label=build)
 ![Release](https://img.shields.io/github/v/release/Princelad/ganesh-auto-parts)
 
@@ -249,7 +249,9 @@ This is a private project. For questions or suggestions, please contact the deve
 
 ## 📄 License
 
-This project is proprietary software. All rights reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**MIT License** - Free to use, modify, and distribute with attribution.
 
 ## 👨‍💻 Development
 

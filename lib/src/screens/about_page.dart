@@ -273,13 +273,13 @@ class AboutPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Private License',
+                    'MIT License',
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'This software is proprietary and confidential. '
-                    'Unauthorized copying, distribution, or modification is prohibited.',
+                    'Open source software licensed under the MIT License. '
+                    'Free to use, modify, and distribute with attribution.',
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
                   ),
                 ],
